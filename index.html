@@ -10,7 +10,7 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#overview">
+      <a class="brand" href="#course">
         <span class="brand-mark">PA</span>
         <span>
           <strong>Price Action Academy</strong>
@@ -19,100 +19,16 @@
       </a>
       <div class="top-actions">
         <nav class="quick-nav" aria-label="站内导航">
-          <a href="#overview">学习首页</a>
           <a href="#course">课程路径</a>
           <a href="#encyclopedia">百科/原图</a>
           <a href="#video-library">字幕资料</a>
           <a href="#materials">资料地图</a>
-          <a href="#drills">训练</a>
+          <a href="#examples">示例图解</a>
+          <a href="#pattern-lab">形态实验室</a>
+          <a href="#glossary">术语库</a>
         </nav>
-        <label class="search-box">
-          <span>全站搜索</span>
-          <input id="courseSearch" type="search" placeholder="趋势、突破、MTR、止损、交易区间..." />
-        </label>
-        <button id="resetProgress" class="ghost-button" type="button">清空进度</button>
       </div>
     </header>
-
-    <section id="overview" class="wide-section overview-section learning-home">
-      <div class="learning-hero">
-        <div class="learning-copy">
-          <p class="eyebrow">One Stop Learning Site</p>
-          <h1>Al Brooks 价格行为学习站</h1>
-          <p>把文件夹里的视频字幕、课程路线、形态百科、PPT/书籍索引和 AB 原图样本整理成一套可查、可学、可训练的网站。</p>
-          <div class="hero-actions">
-            <button id="continueLearning" class="primary-button" type="button">继续学习</button>
-            <button id="jumpEncyclopedia" class="secondary-button" type="button">查形态百科</button>
-            <button id="jumpGallery" class="ghost-button" type="button">看 AB 原图</button>
-          </div>
-        </div>
-        <aside class="continue-card" aria-label="学习进度">
-          <div class="continue-topline">
-            <span>当前进度</span>
-            <strong id="homeProgressText">0/15</strong>
-          </div>
-          <div class="progress-track"><div id="homeProgressFill"></div></div>
-          <p id="homeNextLesson">下一课：建立价格行为语言</p>
-          <div class="continue-links">
-            <a href="#course">课程讲义</a>
-            <a href="#video-library">字幕摘要</a>
-            <a href="#drills">训练清单</a>
-          </div>
-        </aside>
-      </div>
-
-      <div class="section-heading home-heading">
-        <div>
-          <p class="eyebrow">Study Console</p>
-          <h2>学习控制台</h2>
-        </div>
-        <p>推荐顺序：先按课程路径建立语言，再用百科查形态胜率和条件，最后用 AB 原图与训练清单做样本统计。</p>
-      </div>
-      <div id="statGrid" class="stat-grid academy-stat-grid"></div>
-      <div class="learning-path-grid">
-        <article>
-          <span>01</span>
-          <strong>主线课程</strong>
-          <p>按学习路径读每课总结、图解和小测，先形成 Brooks 的市场语言。</p>
-        </article>
-        <article>
-          <span>02</span>
-          <strong>形态百科</strong>
-          <p>按胜率口径和重要性排序，查询背景、入场、止损、目标和陷阱。</p>
-        </article>
-        <article>
-          <span>03</span>
-          <strong>AB 原图样本</strong>
-          <p>每个形态配 5 张 Brooks 原图截图，先看真实图，再做自己的标注。</p>
-        </article>
-        <article>
-          <span>04</span>
-          <strong>训练系统</strong>
-          <p>把学到的 setup 写进开平细节表，做 100 笔、400 笔、500 笔复盘。</p>
-        </article>
-      </div>
-      <div class="overview-layout learning-overview-layout">
-        <article class="panel">
-          <div class="panel-heading">
-            <h2>主题索引</h2>
-            <span>来自全部字幕关键词</span>
-          </div>
-          <div id="topicBars" class="topic-bars"></div>
-        </article>
-        <article class="panel">
-          <div class="panel-heading">
-            <h2>使用方式</h2>
-            <span>一站式学习流程</span>
-          </div>
-          <div class="route-list">
-            <div><strong>先学一课</strong><span>用课程区读讲义、看图解、做小测，不需要回到原视频文件。</span></div>
-            <div><strong>再查形态</strong><span>遇到 MTR、High 2、失败突破等概念时，直接进百科查条件。</span></div>
-            <div><strong>对照原图</strong><span>每个百科条目都嵌入 AB 原图截图，用真实样本修正理解。</span></div>
-            <div><strong>最后训练</strong><span>只选一两个 setup 做大量样本，记录入场、止损、目标和结果。</span></div>
-          </div>
-        </article>
-      </div>
-    </section>
 
     <main id="course" class="course-shell">
       <aside class="lesson-nav" aria-label="课程章节">
@@ -136,21 +52,11 @@
         <article id="lessonContent" class="lesson-content"></article>
 
         <div class="lesson-actions">
-          <button id="completeLesson" class="primary-button" type="button">标记本课完成</button>
           <button id="openPatternLab" class="secondary-button" type="button">打开形态实验室</button>
         </div>
       </section>
 
       <aside class="right-rail">
-        <section class="panel progress-panel">
-          <div class="panel-heading">
-            <h2>学习进度</h2>
-            <span id="progressText"></span>
-          </div>
-          <div class="progress-track"><div id="progressFill"></div></div>
-          <p>目标不是刷完，而是每学一课都能写进自己的开平细节表。</p>
-        </section>
-
         <section class="panel quiz-panel">
           <div class="panel-heading">
             <h2>本课小测</h2>
@@ -308,30 +214,6 @@
       </div>
     </section>
 
-    <section id="drills" class="wide-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Drills</p>
-          <h2>训练系统</h2>
-        </div>
-        <p>把课程转成动作：开平细节表、500 笔训练、每日复盘。</p>
-      </div>
-      <div class="drill-grid">
-        <article class="panel">
-          <h3>开平细节表</h3>
-          <div id="setupTable" class="setup-table"></div>
-        </article>
-        <article class="panel">
-          <h3>500 笔训练阶梯</h3>
-          <div id="drillSteps" class="drill-steps"></div>
-        </article>
-        <article class="panel wide">
-          <h3>每日复盘清单</h3>
-          <div id="reviewList" class="review-list"></div>
-        </article>
-      </div>
-    </section>
-
     <section id="glossary" class="wide-section">
       <div class="section-heading">
         <div>
@@ -344,7 +226,7 @@
     </section>
 
     <footer class="footer-note">
-      <strong>来源说明：</strong>本课程由当前文件夹内的 Al Brooks 核心课、PPT、书籍、图表百科、Louie/Steven/老K/太妃补充课和学习路线文档整理而成。网页内容用于学习和训练，不构成交易建议。
+      <strong>来源说明：</strong>本课程由当前文件夹内的 Al Brooks 核心课、PPT、书籍、图表百科、Louie/Steven/老K/太妃补充课和学习路线文档整理而成。网页内容用于学习和复盘，不构成交易建议。
     </footer>
 
     <script src="site-data.js"></script>

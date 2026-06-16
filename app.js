@@ -425,33 +425,6 @@ const glossary = [
   ["Actual Risk", "实际风险，入场后真实承受的风险。"]
 ];
 
-const setupRows = [
-  ["背景", "趋势 / 区间 / 突破 / 通道；是否 Always In；是否接近磁力位。"],
-  ["形态", "只写一种 setup，例如强突破、High 2、MTR、区间反转。"],
-  ["触发", "信号 K 条件、入场 K 条件、是否需要二次信号。"],
-  ["止损", "结构止损在哪里；实际风险是否过大；仓位如何缩小。"],
-  ["目标", "1R、2R、TBTL、测量移动、区间另一端或下一个磁力位。"],
-  ["不得交易", "信号弱、位置差、目标太近、趋势太强、区间中间。"],
-  ["复盘", "是否完全执行；胜负原因；系统问题还是执行问题。"]
-];
-
-const drillSteps = [
-  ["专题整理", "只选一种 setup，把课程里相关内容汇总成细节表 1.0。"],
-  ["前 100 笔", "每笔都按细节表开平仓，不合规交易剔除。"],
-  ["复盘升级", "统计成功共性和失败高频原因，升级到细节表 2.0。"],
-  ["101-400 笔", "固定规则，不随意修改，观察胜率、盈亏比和手续费。"],
-  ["500 笔后", "常速做单，连续 50 笔全合规记一分，累计 10 分。"]
-];
-
-const reviewItems = [
-  ["市场周期", "今天主要是趋势、区间，还是突破模式？"],
-  ["背景质量", "是否顺 Always In？是否在关键磁力位？"],
-  ["信号质量", "信号 K 收盘、尾巴、大小、位置是否合格？"],
-  ["风险收益", "实际风险是多少？目标是否覆盖成本？"],
-  ["执行纪律", "有没有提前进、追单、移动止损、临时改规则？"],
-  ["错题归因", "亏损是系统问题、执行问题，还是样本内正常波动？"]
-];
-
 const siteData = window.SITE_DATA || {
   stats: {},
   videoLessons: [],
@@ -638,7 +611,6 @@ const state = {
   lesson: Number(localStorage.getItem("activeLesson") || 0),
   pattern: "breakout",
   patternSort: "probability",
-  query: "",
   libraryModule: "all",
   libraryTopic: "all",
   libraryLanguage: "all",
@@ -651,13 +623,10 @@ const state = {
   activeEncyclopediaId: null
 };
 
-const completed = new Set(JSON.parse(localStorage.getItem("completedLessons") || "[]"));
-
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 function init() {
-  renderOverview();
   renderLessonList();
   renderLesson();
   renderEncyclopediaFilters();
@@ -667,7 +636,6 @@ function init() {
   renderMaterials();
   renderExamples();
   renderPatterns();
-  renderDrills();
   renderGlossary();
   bindEvents();
 }
@@ -675,16 +643,7 @@ function init() {
 function bindEvents() {
   $("#prevLesson").addEventListener("click", () => goLesson(state.lesson - 1));
   $("#nextLesson").addEventListener("click", () => goLesson(state.lesson + 1));
-  $("#completeLesson").addEventListener("click", () => {
-    completed.add(state.lesson);
-    saveCompleted();
-    renderLessonList();
-    renderProgress();
-  });
   $("#openPatternLab").addEventListener("click", () => $("#pattern-lab").scrollIntoView({ behavior: "smooth" }));
-  $("#continueLearning").addEventListener("click", () => $("#course").scrollIntoView({ behavior: "smooth" }));
-  $("#jumpEncyclopedia").addEventListener("click", () => $("#encyclopedia").scrollIntoView({ behavior: "smooth" }));
-  $("#jumpGallery").addEventListener("click", () => $("#encyclopedia").scrollIntoView({ behavior: "smooth" }));
   $("#patternSort").addEventListener("change", (event) => {
     state.patternSort = event.target.value;
     renderPatterns();
@@ -737,20 +696,6 @@ function bindEvents() {
     $("#videoSearch").value = "";
     renderVideoLibrary();
   });
-  $("#resetProgress").addEventListener("click", () => {
-    completed.clear();
-    saveCompleted();
-    renderLessonList();
-    renderProgress();
-    $$("[data-drill]").forEach((input) => {
-      input.checked = false;
-      localStorage.removeItem(input.dataset.drill);
-    });
-  });
-  $("#courseSearch").addEventListener("input", (event) => {
-    state.query = event.target.value.trim().toLowerCase();
-    applySearch();
-  });
 }
 
 function goLesson(index) {
@@ -764,10 +709,9 @@ function goLesson(index) {
 function renderLessonList() {
   $("#lessonCount").textContent = `${lessons.length} 课`;
   $("#lessonList").innerHTML = lessons.map((lesson, index) => `
-    <button class="lesson-button searchable ${index === state.lesson ? "active" : ""} ${completed.has(index) ? "done" : ""}" type="button" data-lesson="${index}" data-search="${searchText(lesson)}">
+    <button class="lesson-button searchable ${index === state.lesson ? "active" : ""}" type="button" data-lesson="${index}" data-search="${searchText(lesson)}">
       <span class="lesson-number">${index + 1}</span>
       <span><strong>${lesson.title}</strong><span>${lesson.level} · ${lesson.subtitle}</span></span>
-      <span class="done-dot" aria-hidden="true"></span>
     </button>
   `).join("");
   $$(".lesson-button").forEach((button) => button.addEventListener("click", () => goLesson(Number(button.dataset.lesson))));
@@ -803,10 +747,8 @@ function renderLesson() {
   `;
   renderQuiz(lesson);
   renderTerms(lesson);
-  renderProgress();
   $("#prevLesson").disabled = state.lesson === 0;
   $("#nextLesson").disabled = state.lesson === lessons.length - 1;
-  applySearch();
 }
 
 function renderQuiz(lesson) {
@@ -832,49 +774,6 @@ function renderQuiz(lesson) {
 
 function renderTerms(lesson) {
   $("#lessonTerms").innerHTML = lesson.terms.map((term) => `<span>${term}</span>`).join("");
-}
-
-function renderProgress() {
-  const done = completed.size;
-  const percent = Math.round((done / lessons.length) * 100);
-  $("#progressText").textContent = `${done}/${lessons.length}`;
-  $("#progressFill").style.width = `${percent}%`;
-  const nextLessonIndex = lessons.findIndex((_, index) => !completed.has(index));
-  const nextLesson = lessons[nextLessonIndex === -1 ? state.lesson : nextLessonIndex];
-  const homeProgressText = $("#homeProgressText");
-  const homeProgressFill = $("#homeProgressFill");
-  const homeNextLesson = $("#homeNextLesson");
-  if (homeProgressText) homeProgressText.textContent = `${done}/${lessons.length}`;
-  if (homeProgressFill) homeProgressFill.style.width = `${percent}%`;
-  if (homeNextLesson) {
-    homeNextLesson.textContent = nextLessonIndex === -1
-      ? "主线课程已完成：开始做形态样本复盘"
-      : `下一课：${nextLesson.title}`;
-  }
-}
-
-function saveCompleted() {
-  localStorage.setItem("completedLessons", JSON.stringify([...completed]));
-}
-
-function renderOverview() {
-  const stats = siteData.stats || {};
-  const chartCount = Object.values(abChartImages).reduce((sum, charts) => sum + normalizeChartItems(charts).length, 0);
-  const statItems = [
-    ["主线课程", `${lessons.length} 课`, "按学习顺序推进"],
-    ["字幕讲义", `${formatNumber(stats.subtitleFiles || 0)} 份`, `${formatNumber(stats.uniqueCourseUnits || 0)} 个去重课程单元`],
-    ["形态百科", `${formatNumber(encyclopediaPatterns.length)} 条`, "按胜率和重要性排序"],
-    ["AB 原图", `${formatNumber(chartCount)} 张`, "每个形态 5 张样本"],
-    ["全资料索引", `${formatNumber(stats.totalFiles || 0)} 个`, `${stats.totalGB || 0} GB 本地资料`]
-  ];
-  $("#statGrid").innerHTML = statItems.map(([label, value, note]) => `
-    <article class="stat-card searchable" data-search="${html(`${label} ${value} ${note}`)}">
-      <span>${html(label)}</span>
-      <strong>${html(value)}</strong>
-      <p>${html(note)}</p>
-    </article>
-  `).join("");
-  renderBars("#topicBars", stats.topTopics || [], "topic", "score", "score");
 }
 
 function renderEncyclopediaFilters() {
@@ -916,7 +815,6 @@ function renderEncyclopedia() {
     });
   });
   renderEncyclopediaDetail();
-  applySearch();
 }
 
 function renderEncyclopediaDetail() {
@@ -928,6 +826,7 @@ function renderEncyclopediaDetail() {
   const chartItems = normalizeChartItems(abChartImages[pattern.id]);
   const templateSections = patternTemplateSections(pattern);
   const practiceItems = patternPracticeItems(pattern);
+  const videoInsight = patternVideoInsight(pattern);
   $("#encyclopediaDetail").innerHTML = `
     <div class="pattern-hero encyclopedia-hero searchable" data-search="${html(searchText(pattern))}">
       <div class="diagram">${diagramSvg(pattern.diagram, colorForFamily(pattern.family))}</div>
@@ -964,6 +863,7 @@ function renderEncyclopediaDetail() {
         `).join("")}
       </div>
     </section>
+    ${renderPatternVideoInsight(pattern, videoInsight)}
     ${chartItems.length ? `
       <section class="ab-chart-card searchable" data-search="${html(`${pattern.title} ${chartItems.map((chart) => `${chart.caption} ${chart.source}`).join(" ")}`)}">
         <div class="ab-chart-heading">
@@ -1064,6 +964,194 @@ function patternPracticeItems(pattern) {
       task: "把失败样本单独截图，归入错题本，不和成功样本混在一起。"
     }
   ];
+}
+
+function patternVideoInsight(pattern) {
+  const lessons = siteData.videoLessons || [];
+  const stats = siteData.stats || {};
+  const terms = patternSearchTerms(pattern);
+  const scored = lessons
+    .map((lesson) => ({ lesson, score: lessonRelevanceScore(lesson, pattern, terms) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || b.lesson.wordUnits - a.lesson.wordUnits)
+    .slice(0, 8)
+    .map((item) => item.lesson);
+  const related = scored.length ? scored : lessons.slice(0, 8);
+  const bullets = uniqueOrdered(related.flatMap((lesson) => lesson.bullets || [])).slice(0, 6);
+  const topics = topTopicLabels(related).slice(0, 5);
+  return {
+    subtitleFiles: stats.subtitleFiles || lessons.length,
+    courseUnits: stats.uniqueCourseUnits || lessons.length,
+    topics,
+    bullets,
+    related,
+    thesis: familyVideoThesis(pattern),
+    sequence: [
+      `先判断市场周期：趋势、通道、交易区间，不能只因为看见 ${pattern.title} 就下结论。`,
+      `再确认位置：${firstText(pattern.best)}`,
+      `然后等触发：${firstText(pattern.entry)}`,
+      `最后检查交易者方程：止损看 ${firstText(pattern.stop)}，目标先看 ${firstText(pattern.target)}。`
+    ],
+    warning: firstText(pattern.traps)
+  };
+}
+
+function renderPatternVideoInsight(pattern, insight) {
+  return `
+    <section class="video-insight-card searchable" data-search="${html(`${pattern.title} ${insight.thesis} ${insight.sequence.join(" ")} ${insight.bullets.join(" ")}`)}">
+      <div class="template-heading">
+        <div>
+          <p class="eyebrow">AI Summary From All Video Subtitles</p>
+          <h4>全部视频字幕 AI 综合</h4>
+        </div>
+        <span>${formatNumber(insight.subtitleFiles)} 份字幕 / ${formatNumber(insight.courseUnits)} 个课程单元</span>
+      </div>
+      <div class="video-insight-layout">
+        <article>
+          <h5>Brooks 讲这个形态的核心意思</h5>
+          <p>${html(insight.thesis)}</p>
+          <p>放到 ${html(pattern.title)} 上，重点不是背形态名字，而是用视频里反复强调的顺序判断：背景、位置、信号、风险、目标和失败条件必须同时成立。</p>
+        </article>
+        <article>
+          <h5>字幕总结出的判断顺序</h5>
+          <ol>${insight.sequence.map((item) => `<li>${html(item)}</li>`).join("")}</ol>
+        </article>
+        <article>
+          <h5>视频里反复提醒的误区</h5>
+          <p>${html(insight.warning)}</p>
+          <ul>${insight.bullets.slice(0, 4).map((item) => `<li>${html(item)}</li>`).join("")}</ul>
+        </article>
+      </div>
+      <div class="related-video-lessons">
+        <div class="related-heading">
+          <h5>相关字幕课摘要</h5>
+          <span>${insight.topics.map((topic) => html(topic)).join(" / ")}</span>
+        </div>
+        <div class="related-video-grid">
+          ${insight.related.slice(0, 6).map((lesson) => `
+            <article class="related-video-card">
+              <span>${html(lesson.module)} · ${html(lesson.language)}</span>
+              <strong>${html(lesson.title)}</strong>
+              <p>${html(lesson.summary)}</p>
+              <small>${html((lesson.topics || []).slice(0, 4).join(" / "))}</small>
+            </article>
+          `).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function patternSearchTerms(pattern) {
+  const familyTerms = {
+    "突破": ["breakout", "breakouts", "follow-through", "breakout pullback", "failed breakout", "突破", "跟随"],
+    "回调": ["pullback", "pullbacks", "bar counting", "high 2", "low 2", "h2", "l2", "回调", "数K"],
+    "交易区间": ["trading range", "range", "tight trading range", "tr", "ttr", "交易区间", "区间"],
+    "通道": ["channel", "channels", "broad channel", "tight channel", "通道"],
+    "趋势": ["trend", "trends", "always in", "always-in", "趋势"],
+    "反转/MTR": ["major trend reversal", "mtr", "reversal", "trend reversal", "反转"],
+    "楔形": ["wedge", "wedges", "three pushes", "三推", "楔形"],
+    "末端旗形": ["final flag", "final flags", "末端旗形"],
+    "双顶双底": ["double top", "double bottom", "dt", "db", "双顶", "双底"],
+    "三角形": ["triangle", "triangles", "三角形"],
+    "头肩": ["head and shoulders", "头肩"],
+    "圆弧": ["rounding", "rounded", "圆弧"],
+    "高潮": ["climax", "climaxes", "buy climax", "sell climax", "高潮"],
+    "缺口": ["gap", "gaps", "measuring gap", "breakaway gap", "缺口"],
+    "开盘": ["open", "opening", "first hour", "开盘"],
+    "目标/磁力": ["magnet", "measured move", "support and resistance", "目标", "磁力", "测量移动"],
+    "K线信号": ["signal bar", "entry bar", "outside bar", "inside bar", "信号K"],
+    "失败形态": ["failed", "failure", "trap", "失败", "陷阱"],
+    "入场逻辑": ["entry", "entries", "stop order", "limit order", "入场"],
+    "交易管理": ["management", "scalp", "swing", "actual risk", "risk", "管理"]
+  };
+  return uniqueOrdered([
+    pattern.title,
+    pattern.family,
+    pattern.diagram,
+    pattern.source,
+    ...(pattern.aliases || []),
+    ...(familyTerms[pattern.family] || []),
+    ...String(pattern.title).split(/[ /+]+/),
+    ...String(pattern.source || "").match(/PAF\s*\d+[A-Z]?|HTT\s*\d+/gi) || []
+  ].map((term) => String(term || "").trim()).filter((term) => term.length > 1));
+}
+
+function lessonRelevanceScore(lesson, pattern, terms) {
+  const text = searchText(lesson).toLowerCase();
+  let score = 0;
+  terms.forEach((term) => {
+    const normalized = term.toLowerCase();
+    if (!normalized) return;
+    if (text.includes(normalized)) score += normalized.length > 8 ? 12 : 7;
+  });
+  if ((lesson.topics || []).some((topic) => topicMatchesFamily(topic, pattern.family))) score += 18;
+  if (String(pattern.source || "").toLowerCase().includes(String(lesson.title || "").toLowerCase().slice(0, 8))) score += 12;
+  return score;
+}
+
+function topicMatchesFamily(topic, family) {
+  const map = {
+    "突破": ["突破", "市场周期"],
+    "回调": ["回调与数K", "趋势与Always In"],
+    "交易区间": ["交易区间", "市场周期"],
+    "通道": ["通道", "趋势与Always In"],
+    "趋势": ["趋势与Always In", "市场周期"],
+    "反转/MTR": ["反转/MTR", "趋势与Always In"],
+    "楔形": ["楔形/三推"],
+    "末端旗形": ["末端旗形/高潮"],
+    "高潮": ["末端旗形/高潮"],
+    "缺口": ["突破", "开盘与日内"],
+    "开盘": ["开盘与日内"],
+    "目标/磁力": ["支撑阻力/磁力", "测量移动"],
+    "K线信号": ["K线与信号"],
+    "失败形态": ["突破", "反转/MTR"],
+    "入场逻辑": ["订单与止损", "交易管理"],
+    "交易管理": ["交易管理", "订单与止损"]
+  };
+  return (map[family] || []).includes(topic);
+}
+
+function familyVideoThesis(pattern) {
+  const thesis = {
+    "突破": "视频课里 Brooks 反复强调，突破本身不是证据，突破后的跟随才是证据；在交易区间里，多数突破尝试会失败，只有强收盘和后续K线继续推进，概率才会上升。",
+    "回调": "Brooks 讲回调时，核心是原趋势是否仍然控制市场。High 2、Low 2 和两段回调不是机械数K，而是看逆势方两次尝试失败后，顺势方是否重新接管。",
+    "交易区间": "交易区间课程的主线是买低卖高、边缘优于中间、目标要务实。区间里双方都能赚钱，但追突破的一方更容易在失败突破里被困住。",
+    "通道": "通道相关视频强调趋势仍存在，但推进方式更重叠、更容易双向交易。通道末端要降低顺势追单预期，更多等待通道线、均线或前高低附近的二次信号。",
+    "趋势": "趋势视频的核心是 Always In 控制权。强趋势里第一反转大多只是回调，顺势交易优先，逆势交易必须等结构破坏、测试失败和二次证据。",
+    "反转/MTR": "主要趋势反转不是猜顶底。Brooks 通常要求先有趋势线突破，再有回测原极端失败，最后有二次信号或更高低点/更低高点，才把反转当成交易计划。",
+    "楔形": "楔形和三推视频强调动能衰竭，但衰竭不等于立刻反转。顺大趋势的楔形旗形通常比逆大趋势的楔形反转更可靠，第三推后的跟随决定质量。",
+    "末端旗形": "末端旗形在视频里常被当作趋势末期陷阱：它看起来像顺势整理，但如果突破没有跟随、很快回到旗形内，就说明最后一批追单者可能被套住。",
+    "高潮": "高潮课程强调远离均线、连续大K和情绪化推进后，市场常进入横盘或两段回调。高潮后不要默认立刻反转，也不要在末端追最差价格。",
+    "缺口": "缺口视频强调重新定价和测试。缺口不被回补且有跟随时可能成为测量缺口；快速回补则说明缺口方向没有控制权。",
+    "开盘": "开盘视频强调速度、昨日高低点、开盘价和早盘失败。开盘形态不能脱离日内磁力位，强开盘会形成趋势日，失败开盘会快速回到区间。",
+    "目标/磁力": "支撑阻力和测量移动课程强调，磁力位告诉你价格可能被吸引的位置，不直接告诉方向；真正的交易要等到位后的突破、失败或反转证据。",
+    "K线信号": "信号K课程强调单根漂亮K线不能脱离背景。信号K只提供触发，位置、左侧结构和入场K跟随才决定它是否值得交易。",
+    "失败形态": "失败形态在 Brooks 体系里很重要，因为被困交易者会成为反向燃料。失败是否成立，要看突破或反转尝试后是否快速回到原结构内，并出现反向跟随。",
+    "入场逻辑": "入场课程强调订单方式必须匹配市场速度。止损单适合突破和强趋势，限价单多用于区间边缘；入场后没有跟随，要快速降低预期。",
+    "交易管理": "交易管理视频反复讲实际风险、目标距离、手续费和滑点。看对方向不等于能赚钱，只有概率、风险和回报同时合格，交易者方程才成立。"
+  };
+  return thesis[pattern.family] || `视频课里 Brooks 对 ${pattern.title} 的共同要求是先判断市场周期，再看位置和信号，最后用实际风险与目标距离决定是否值得交易。`;
+}
+
+function topTopicLabels(lessons) {
+  const counts = lessons.reduce((acc, lesson) => {
+    (lesson.topics || []).forEach((topic) => {
+      acc[topic] = (acc[topic] || 0) + 1;
+    });
+    return acc;
+  }, {});
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([topic]) => topic);
+}
+
+function uniqueOrdered(values) {
+  const seen = new Set();
+  return values.filter((value) => {
+    const key = String(value || "").trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function renderAnnotatedChartFigure(pattern, chart, index) {
@@ -1178,7 +1266,6 @@ function renderVideoLibrary() {
     });
   });
   renderVideoDetail();
-  applySearch();
 }
 
 function renderVideoDetail() {
@@ -1245,7 +1332,6 @@ function renderExamples() {
   });
   renderExampleDetail();
   $("#chartReferenceList").innerHTML = (siteData.chartReferences || []).slice(0, 24).map((source) => sourceRow(source)).join("");
-  applySearch();
 }
 
 function renderExampleDetail() {
@@ -1291,7 +1377,6 @@ function renderPatterns() {
     });
   });
   renderPatternDetail();
-  applySearch();
 }
 
 function renderPatternDetail() {
@@ -1325,33 +1410,6 @@ function infoBlock(title, items) {
       <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
     </article>
   `;
-}
-
-function renderDrills() {
-  $("#setupTable").innerHTML = setupRows.map(([label, text]) => `
-    <div class="setup-row searchable" data-search="${label} ${text}">
-      <strong>${label}</strong><span>${text}</span>
-    </div>
-  `).join("");
-  $("#drillSteps").innerHTML = drillSteps.map(([title, text], index) => {
-    const key = `drill-${index}`;
-    const checked = localStorage.getItem(key) === "done" ? "checked" : "";
-    return `
-      <label class="drill-step searchable" data-search="${title} ${text}">
-        <input type="checkbox" data-drill="${key}" ${checked} />
-        <span><strong>${title}</strong><br><span>${text}</span></span>
-      </label>
-    `;
-  }).join("");
-  $$("[data-drill]").forEach((input) => input.addEventListener("change", () => {
-    if (input.checked) localStorage.setItem(input.dataset.drill, "done");
-    else localStorage.removeItem(input.dataset.drill);
-  }));
-  $("#reviewList").innerHTML = reviewItems.map(([title, text]) => `
-    <article class="review-item searchable" data-search="${title} ${text}">
-      <strong>${title}</strong><span>${text}</span>
-    </article>
-  `).join("");
 }
 
 function renderGlossary() {
@@ -1478,14 +1536,6 @@ function html(value) {
     "\"": "&quot;",
     "'": "&#39;"
   })[char]);
-}
-
-function applySearch() {
-  const query = state.query;
-  $$(".searchable").forEach((element) => {
-    const text = (element.dataset.search || element.textContent || "").toLowerCase();
-    element.classList.toggle("hidden-by-search", Boolean(query) && !text.includes(query));
-  });
 }
 
 function searchText(value) {

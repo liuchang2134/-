@@ -2308,6 +2308,86 @@ body {
   gap: 10px;
 }
 
+.video-insight-card {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.video-insight-layout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.video-insight-layout article,
+.related-video-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.video-insight-layout h5,
+.related-heading h5,
+.related-video-card strong {
+  margin: 0;
+  color: var(--ink);
+}
+
+.video-insight-layout p,
+.video-insight-layout li,
+.related-video-card p,
+.related-video-card small {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.video-insight-layout ol,
+.video-insight-layout ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.related-video-lessons {
+  display: grid;
+  gap: 10px;
+}
+
+.related-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.related-heading span,
+.related-video-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.related-video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.related-video-card {
+  display: grid;
+  gap: 8px;
+}
+
+.related-video-card p {
+  margin: 0;
+}
+
 .template-card,
 .practice-card {
   padding: 12px;
@@ -2449,6 +2529,11 @@ body {
 
   .template-grid,
   .practice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .video-insight-layout,
+  .related-video-grid {
     grid-template-columns: 1fr;
   }
 }
