@@ -912,8 +912,6 @@ function init() {
   renderVideoFilters();
   renderVideoLibrary();
   renderMaterials();
-  renderExamples();
-  renderPatterns();
   renderGlossary();
   bindEvents();
 }
@@ -921,11 +919,7 @@ function init() {
 function bindEvents() {
   $("#prevLesson").addEventListener("click", () => goLesson(state.lesson - 1));
   $("#nextLesson").addEventListener("click", () => goLesson(state.lesson + 1));
-  $("#openPatternLab").addEventListener("click", () => $("#pattern-lab").scrollIntoView({ behavior: "smooth" }));
-  $("#patternSort").addEventListener("change", (event) => {
-    state.patternSort = event.target.value;
-    renderPatterns();
-  });
+  $("#openPatternLab").addEventListener("click", () => $("#encyclopedia").scrollIntoView({ behavior: "smooth" }));
   $("#encyclopediaSort").addEventListener("change", (event) => {
     state.encyclopediaSort = event.target.value;
     renderEncyclopedia();
@@ -1022,10 +1016,9 @@ function renderHome() {
   `;
 
   $("#homeRoutes").innerHTML = [
-    ["01", "建立框架", "先学市场周期、Always In、交易者方程，避免只背形态。", "#core-theory"],
-    ["02", "查形态", "按胜率和重要性查 72 个形态，直接看背景、触发、止损和目标。", "#encyclopedia"],
-    ["03", "看原图", "在每个形态里对照 Brooks 原图中文标注，练读图顺序。", "#encyclopedia"],
-    ["04", "回到字幕", "需要细节时再进入字幕库，按主题找到对应课程摘要。", "#video-library"]
+    ["01", "先建框架", "用核心理论建立 Brooks 的市场周期、Always In 和交易者方程。", "#core-theory"],
+    ["02", "系统学习", "按课程顺序读，不直接跳进 72 个形态里找答案。", "#course"],
+    ["03", "查形态", "需要交易结构时，再进形态百科看背景、触发、止损和原图。", "#encyclopedia"]
   ].map(([step, title, text, href]) => `
     <a class="route-card searchable" href="${href}" data-search="${html(`${step} ${title} ${text}`)}">
       <span>${step}</span>
@@ -1035,12 +1028,9 @@ function renderHome() {
   `).join("");
 
   $("#homeModuleGrid").innerHTML = [
-    ["课程路径", "完整学习线", "像课程一样逐课学习，不先被 72 个形态淹没。", "#course", "主线"],
-    ["形态百科", "胜率排序查表", "按 Brooks 语境整理背景、触发、管理和原图。", "#encyclopedia", "查阅"],
-    ["核心理论", "抽象规则", "单独学习不绑定图片的市场周期、订单和心理流程。", "#core-theory", "框架"],
     ["字幕库", "全视频摘要", "按模块、主题和语言检索全部视频文字资料。", "#video-library", "溯源"],
-    ["资料地图", "原文件索引", "需要 PDF、PPT、书籍和补充课时再进入。", "#materials", "资料"],
-    ["练习工具", "实验室和术语", "用示例图、形态实验室和术语库做复盘。", "#pattern-lab", "训练"]
+    ["资料地图", "原文件索引", "需要 PDF、PPT、书籍和补充课时再进入。", "#materials", "原始资料"],
+    ["术语库", "概念速查", "忘记 Always In、MTR、TBTL 等术语时再查。", "#glossary", "附录"]
   ].map(([title, label, text, href, badge]) => `
     <a class="home-module-card searchable" href="${href}" data-search="${html(`${title} ${label} ${text} ${badge}`)}">
       <span>${html(badge)}</span>

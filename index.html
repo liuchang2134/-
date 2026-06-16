@@ -20,10 +20,9 @@
       <div class="top-actions">
         <nav class="quick-nav" aria-label="站内导航">
           <a href="#home">首页</a>
-          <a href="#course">课程路径</a>
+          <a href="#course">系统学习</a>
           <a href="#encyclopedia">形态百科</a>
-          <a href="#core-theory">核心理论</a>
-          <a href="#video-library">字幕库</a>
+          <a href="#video-library">资料库</a>
         </nav>
       </div>
     </header>
@@ -33,7 +32,7 @@
         <div class="academy-hero-copy">
           <p class="eyebrow">Al Brooks Price Action System</p>
           <h1>把 Al Brooks 资料整理成一套能学、能查、能复盘的价格行为学院</h1>
-          <p>第一屏只保留最重要的学习路径：先建立 Brooks 核心框架，再按胜率查形态，最后回到原图和字幕验证细节。</p>
+          <p>不再把资料一次性铺开。先学框架，再查形态，需要溯源时进入资料库。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#course">开始系统学习</a>
             <a class="secondary-button" href="#encyclopedia">查形态百科</a>
@@ -58,10 +57,10 @@
 
       <div class="section-heading home-heading">
         <div>
-          <p class="eyebrow">Study Workspace</p>
-          <h2>按目标进入，不把所有资料一次性铺开</h2>
+          <p class="eyebrow">Appendix</p>
+          <h2>附录只保留资料入口</h2>
         </div>
-        <p>主线学习、查表、理论、字幕和资料都还在，只是改成分层入口。你需要什么，就进入哪一块。</p>
+        <p>主学习路径不再重复出现。字幕、原文件和术语都放在这里，需要时再进入。</p>
       </div>
       <div id="homeModuleGrid" class="home-module-grid"></div>
     </section>
@@ -88,7 +87,7 @@
         <article id="lessonContent" class="lesson-content"></article>
 
         <div class="lesson-actions">
-          <button id="openPatternLab" class="secondary-button" type="button">打开形态实验室</button>
+          <button id="openPatternLab" class="secondary-button" type="button">查形态百科</button>
         </div>
       </section>
 
@@ -216,49 +215,6 @@
           </div>
           <div id="kindBars" class="topic-bars compact-bars"></div>
         </article>
-      </div>
-    </section>
-
-    <section id="examples" class="wide-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Brooks Examples</p>
-          <h2>Al Brooks 形态示例图解</h2>
-        </div>
-        <p>这里用简化图讲结构；真正的 AB 原图截图已经放进形态百科，每个形态 5 张样本，方便你边查边对照。</p>
-      </div>
-      <div class="example-layout">
-        <div id="exampleGrid" class="example-grid"></div>
-        <article id="exampleDetail" class="panel example-detail"></article>
-      </div>
-      <article class="panel atlas-panel">
-        <div class="panel-heading">
-          <h2>图表百科入口</h2>
-          <span>本地 PDF 索引</span>
-        </div>
-        <p class="muted-text">百科条目内已经嵌入 AB 原图截图；这里保留本地图表百科 PDF 入口，方便你继续追溯整页上下文。</p>
-        <div id="chartReferenceList" class="source-list compact-source-list"></div>
-      </article>
-    </section>
-
-    <section id="pattern-lab" class="wide-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Pattern Lab</p>
-          <h2>形态实验室</h2>
-        </div>
-        <label class="compact-select">
-          <span>排序</span>
-          <select id="patternSort">
-            <option value="probability">按概率口径</option>
-            <option value="sequence">按学习顺序</option>
-            <option value="difficulty">按执行难度</option>
-          </select>
-        </label>
-      </div>
-      <div class="pattern-layout">
-        <div id="patternList" class="pattern-list"></div>
-        <article id="patternDetail" class="panel pattern-detail"></article>
       </div>
     </section>
 
