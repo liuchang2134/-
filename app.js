@@ -1264,7 +1264,7 @@ function renderCoreTheoryCard(module, index) {
             <article class="theory-source-row">
               <span>${html(lesson.module)} · ${html(lesson.language)} · ${formatDuration(lesson.minutesEstimate || 0)}</span>
               <strong>${html(lesson.title)}</strong>
-              <p>${html(lesson.summary)}</p>
+              <p>${html(videoLessonBrief(lesson))}</p>
             </article>
           `).join("")}
         </div>
@@ -1307,12 +1307,15 @@ function patternVideoInsight(pattern) {
   const lessons = siteData.videoLessons || [];
   const stats = siteData.stats || {};
   const terms = patternSearchTerms(pattern);
-  const scored = lessons
+  const abLessons = lessons.filter((lesson) => String(lesson.module || "").includes("核心视频课"));
+  const lessonPool = abLessons.length ? abLessons : lessons;
+  const scored = lessonPool
     .map((lesson) => ({ lesson, score: lessonRelevanceScore(lesson, pattern, terms) }))
     .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score || b.lesson.wordUnits - a.lesson.wordUnits)
-    .slice(0, 10);
-  const related = scored.length ? scored.map((item) => item.lesson) : lessons.slice(0, 8);
+    .sort((a, b) => b.score - a.score || b.lesson.wordUnits - a.lesson.wordUnits);
+  const relatedScores = strongestRelatedScores(scored);
+  const related = relatedScores.length ? relatedScores.map((item) => item.lesson) : lessonPool.slice(0, 8);
+  const courseRefs = relatedCourseRefs(related);
   const bullets = uniqueOrdered(related.flatMap((lesson) => lesson.bullets || [])).slice(0, 6);
   const topics = topTopicLabels(related).slice(0, 5);
   const primaryLesson = related[0];
@@ -1326,11 +1329,13 @@ function patternVideoInsight(pattern) {
   return {
     subtitleFiles: stats.subtitleFiles || lessons.length,
     courseUnits: stats.uniqueCourseUnits || lessons.length,
-    relatedCount: scored.length || related.length,
+    relatedCount: courseRefs.length || related.length,
     topics,
     bullets,
     related,
+    courseRefs,
     primaryLesson,
+    synthesis: patternLectureSynthesis(pattern, related, courseRefs, topics, bullets),
     thesis: familyVideoThesis(pattern),
     patternFocus: patternCourseFocus(pattern),
     checklist,
@@ -1350,59 +1355,24 @@ function patternVideoInsight(pattern) {
 
 function renderPatternVideoInsight(pattern, insight) {
   return `
-    <section class="video-insight-card course-insight searchable" data-search="${html(`${pattern.title} ${insight.thesis} ${insight.patternFocus} ${insight.sequence.join(" ")} ${insight.bullets.join(" ")}`)}">
+    <section class="video-insight-card course-insight searchable" data-search="${html(`${pattern.title} ${insight.synthesis} ${insight.topics.join(" ")} ${insight.courseRefs.map((course) => course.title).join(" ")}`)}">
       <div class="template-heading">
         <div>
           <p class="eyebrow">Al Brooks Video Course Notes</p>
-          <h4>视频课讲解总结：怎么理解 ${html(pattern.title)}</h4>
+          <h4>AB 视频课综合讲解：${html(pattern.title)}</h4>
         </div>
-        <span>匹配 ${formatNumber(insight.relatedCount)} 节相关课 · 全库 ${formatNumber(insight.subtitleFiles)} 份字幕</span>
+        <span>综合 ${formatNumber(insight.relatedCount)} 个相关 AB 核心课 · 主题 ${insight.topics.map((topic) => html(topic)).join(" / ")}</span>
       </div>
-      <div class="course-insight-main">
-        <article class="course-thesis">
-          <span>01</span>
-          <h5>Brooks 讲这类形态真正想让你抓住什么</h5>
-          <p>${html(insight.thesis)}</p>
-          <p>${html(insight.patternFocus)}</p>
-        </article>
-        <article class="course-checklist">
-          <span>02</span>
-          <h5>套到这个形态，入场前按这 5 句检查</h5>
-          <div class="course-check-grid">
-            ${insight.checklist.map((item) => `
-              <div>
-                <strong>${html(item.label)}</strong>
-                <p>${html(item.value)}</p>
-              </div>
-            `).join("")}
-          </div>
-        </article>
-      </div>
-      <div class="course-insight-layout">
-        <article>
-          <h5>按课程思路读图的顺序</h5>
-          <ol>${insight.sequence.map((item) => `<li>${html(item)}</li>`).join("")}</ol>
-        </article>
-        <article>
-          <h5>这一形态最容易学错的地方</h5>
-          <ul>${insight.mistakes.map((item) => `<li>${html(item)}</li>`).join("")}</ul>
-        </article>
-      </div>
+      <article class="lecture-synthesis-card">
+        <p>${html(insight.synthesis)}</p>
+      </article>
       <div class="related-video-lessons">
         <div class="related-heading">
-          <h5>相关视频课摘要</h5>
-          <span>${insight.topics.map((topic) => html(topic)).join(" / ")}</span>
+          <h5>相关 AB 核心课</h5>
+          <span>已合并中英文同名课程</span>
         </div>
-        <div class="related-video-grid">
-          ${insight.related.slice(0, 6).map((lesson) => `
-            <article class="related-video-card">
-              <span>${html(lesson.module)} · ${html(lesson.language)}</span>
-              <strong>${html(lesson.title)}</strong>
-              <p>${html(lesson.summary)}</p>
-              ${(lesson.bullets || []).length ? `<ul>${lesson.bullets.slice(0, 3).map((item) => `<li>${html(item)}</li>`).join("")}</ul>` : ""}
-              <small>${html((lesson.topics || []).slice(0, 4).join(" / "))}</small>
-            </article>
-          `).join("")}
+        <div class="related-course-labels">
+          ${renderCourseSourceChips(insight)}
         </div>
       </div>
     </section>
@@ -1411,6 +1381,71 @@ function renderPatternVideoInsight(pattern, insight) {
 
 function patternCourseFocus(pattern) {
   return `放到 ${pattern.title} 上，学习重点不是把名字背下来，而是看它是否同时满足 Brooks 反复讲的四件事：背景合适、位置有优势、触发后有跟随、风险收益划算。这个形态的第一判断句是：${firstText(pattern.best)}；真正的触发句是：${firstText(pattern.entry)}。`;
+}
+
+function strongestRelatedScores(scored) {
+  if (!scored.length) return [];
+  const topScore = scored[0].score || 0;
+  const minScore = Math.max(16, Math.round(topScore * 0.22));
+  return scored.filter((item) => item.score >= minScore);
+}
+
+function relatedCourseRefs(lessons) {
+  const map = new Map();
+  lessons.forEach((lesson, index) => {
+    const title = normalizedCourseTitle(lesson.title);
+    const entry = map.get(title) || {
+      title,
+      order: index,
+      languages: new Set(),
+      topics: new Set()
+    };
+    entry.languages.add(lesson.language || "课程");
+    (lesson.topics || []).slice(0, 3).forEach((topic) => entry.topics.add(topic));
+    map.set(title, entry);
+  });
+  return [...map.values()]
+    .sort((a, b) => a.order - b.order)
+    .map((entry) => ({
+      title: entry.title,
+      languages: [...entry.languages].sort().join("/"),
+      topics: [...entry.topics].slice(0, 3).join(" / ") || "价格行为"
+    }));
+}
+
+function normalizedCourseTitle(title) {
+  return String(title || "AB 课程")
+    .replace(/\s+/g, " ")
+    .replace(/\s+\((?:中文|英文|CN|EN)\)$/i, "")
+    .trim();
+}
+
+function patternLectureSynthesis(pattern, related, courseRefs, topics, bullets) {
+  const topicText = topics.length ? topics.join("、") : pattern.family;
+  const courseText = courseRefs.slice(0, 6).map((course) => course.title).join("、");
+  const extraText = courseRefs.length > 6 ? `等 ${formatNumber(courseRefs.length)} 个相关 AB 核心课` : `${formatNumber(courseRefs.length)} 个相关 AB 核心课`;
+  const bulletText = bullets.slice(0, 3).join("；");
+  return `综合 ${courseText ? `${courseText} ${extraText}` : "相关 AB 核心课"}来看，Brooks 讲 ${pattern.title} 时真正强调的不是形态名称，而是市场背景、位置优势、触发后的跟随和交易者方程。这个形态要先放进 ${topicText} 的语境里判断：最佳背景是 ${firstText(pattern.best)}，有效触发是 ${firstText(pattern.entry)}，止损通常参考 ${firstText(pattern.stop)}，目标先看 ${firstText(pattern.target)}；如果出现 ${firstText(pattern.traps)}，就说明这笔交易的前提正在失效。相关课程共同指向的读图动作是：先判断趋势、通道还是交易区间，再看信号 K 是否处在有优势的位置，最后用实际风险和目标距离决定是波段、剥头皮还是放弃。${bulletText ? `课程里反复提醒：${bulletText}。` : ""}`;
+}
+
+function renderCourseSourceChips(insight) {
+  const refs = insight.courseRefs.length ? insight.courseRefs : relatedCourseRefs(insight.related);
+  const visible = refs.slice(0, 12);
+  const hiddenCount = Math.max(0, refs.length - visible.length);
+  return `
+    ${visible.map((course) => `
+      <span class="course-source-chip">
+        <strong>${html(course.title)}</strong>
+        <em>${html(course.languages)} · ${html(course.topics)}</em>
+      </span>
+    `).join("")}
+    ${hiddenCount ? `
+      <span class="course-source-chip muted-chip">
+        <strong>另有 ${formatNumber(hiddenCount)} 节同主题 AB 课</strong>
+        <em>已合并进上方综合讲解</em>
+      </span>
+    ` : ""}
+  `;
 }
 
 function patternSearchTerms(pattern) {
@@ -1763,6 +1798,51 @@ function sortedEncyclopediaPatterns() {
   });
 }
 
+function videoLessonBrief(lesson) {
+  const topics = lesson.topics || [];
+  const primary = topics[0] || "价格行为";
+  const secondary = topics.slice(1, 3).join("、");
+  const angle = lessonTitleAngle(lesson);
+  const bullets = (lesson.bullets || []).slice(0, 2).map(cleanBriefItem).join("；");
+  const metrics = `${formatDuration(lesson.minutesEstimate || 0)}，${formatNumber(lesson.cueCount || 0)} 条字幕`;
+  return `${angle} 这一节主要服务于 ${primary}${secondary ? `，同时关联 ${secondary}` : ""}。读这节课时只提炼三件事：Brooks 怎样定义背景、哪里算有效触发、什么情况下要降低预期或放弃。${bullets ? `关键提醒：${bullets}。` : ""} 来源量级：${metrics}。`;
+}
+
+function lessonTitleAngle(lesson) {
+  const title = String(lesson.title || "");
+  const paf = title.match(/\bPAF\s*(\d+)([A-Z]?)/i);
+  const part = paf ? `${paf[1]}${paf[2] || ""}` : "";
+  if (/terminology/i.test(title)) return "这节是术语入口，重点是把 Brooks 的语言翻译成可执行的读图规则";
+  if (/chart basics/i.test(title)) return `PAF ${part} 属于图表基础课，重点是先读结构，再谈信号`;
+  if (/reversal|MTR/i.test(title)) return `PAF ${part || ""} 讲主要趋势反转，重点是趋势线突破、测试失败和第二次信号`;
+  if (/trend/i.test(title)) return trendLessonAngle(part);
+  if (/breakout/i.test(title)) return `PAF ${part || ""} 围绕突破质量展开，重点看强收盘、跟随和失败后的反向燃料`;
+  if (/trading range|range/i.test(title)) return `PAF ${part || ""} 讲交易区间，重点是边缘交易、失败突破和中间少做`;
+  if (/pullback|bar counting|high 2|low 2/i.test(title)) return `PAF ${part || ""} 讲回调和数 K，重点是趋势方如何在二次入场后重新控盘`;
+  if (/wedge|three pushes/i.test(title)) return `PAF ${part || ""} 讲楔形/三推，重点是动能衰减、位置和两段反向运动`;
+  if (/final flag|climax/i.test(title)) return `PAF ${part || ""} 讲末端结构，重点是趋势过度延伸后继续形态如何失败`;
+  if (/channel/i.test(title)) return `PAF ${part || ""} 讲通道，重点是区分紧密通道、宽通道和通道边界反应`;
+  if (/open/i.test(title)) return `PAF ${part || ""} 讲开盘，重点是早盘定调、昨日高低点和快速失败`;
+  if (/order|stop|management|scalp|swing/i.test(title)) return `PAF ${part || ""} 讲执行管理，重点是实际风险、目标距离和退出规则`;
+  return `${title} 这节课的作用是把相关价格行为概念压缩成可复盘的读图步骤`;
+}
+
+function cleanBriefItem(text) {
+  return String(text || "").replace(/[。；;,.，、\s]+$/g, "");
+}
+
+function trendLessonAngle(part) {
+  const suffix = String(part || "").replace(/^\d+/, "");
+  const map = {
+    A: "PAF 14A 是趋势章节入口，重点是趋势定义、趋势日特征和 Always In 控制权",
+    B: "PAF 14B 继续拆趋势，重点是趋势中的回调、继续和反转尝试为什么大多失败",
+    C: "PAF 14C 用来区分强趋势、弱趋势和通道化趋势，重点是趋势强度变化",
+    D: "PAF 14D 把趋势放回市场周期，重点是趋势、通道、交易区间之间的转换",
+    E: "PAF 14E 更适合练趋势后期判断，重点是跟随减弱后是否进入通道或区间"
+  };
+  return map[suffix] || `PAF ${part || "趋势课"} 讲趋势环境，重点是方向控制权、回调质量和逆势失败`;
+}
+
 function renderVideoFilters() {
   const lessons = siteData.videoLessons || [];
   const modules = uniqueSorted(lessons.map((lesson) => lesson.module));
@@ -1795,7 +1875,7 @@ function renderVideoLibrary() {
     <button class="video-card searchable ${lesson.id === state.activeVideoId ? "active" : ""}" type="button" data-video="${lesson.id}" data-search="${html(searchText(lesson))}">
       <span class="video-card-top"><strong>${html(lesson.title)}</strong><em>${html(lesson.language)}</em></span>
       <span>${html(lesson.module)} · ${html(lesson.section)}</span>
-      <p>${html(lesson.summary)}</p>
+      <p>${html(videoLessonBrief(lesson))}</p>
       <span class="tag-line">${(lesson.topics || []).slice(0, 3).map((topic) => `<i>${html(topic)}</i>`).join("")}</span>
     </button>
   `).join("") || `<div class="empty-state">没有匹配的字幕摘要。换一个主题或清空筛选。</div>`;
@@ -1819,7 +1899,7 @@ function renderVideoDetail() {
     <div class="detail-header searchable" data-search="${html(searchText(lesson))}">
       <p class="eyebrow">${html(lesson.module)} · ${html(lesson.language)}</p>
       <h3>${html(lesson.title)}</h3>
-      <p>${html(lesson.summary)}</p>
+      <p>${html(videoLessonBrief(lesson))}</p>
       <div class="pattern-meta">
         <span class="pill">${html(lesson.section)}</span>
         <span class="pill">${formatDuration(lesson.minutesEstimate || 0)}</span>
