@@ -324,86 +324,19 @@ def find_clear_text_box(
     return (sx1, sy1, sx1 + target_w, sy1 + target_h)
 
 
-def replace_english_with_chinese_panels(image: Image.Image, pattern: dict, chart: dict, index: int) -> Image.Image:
-    width, height = image.size
-    result = scrub_slide_text_zones(image).convert("RGBA")
-    overlay = Image.new("RGBA", result.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-    title_h = max(54, int(height * 0.105))
-    footer_top = int(height * 0.955)
-    title = zh_terms(pattern.get("title", "价格行为形态"))
-
-    # Replace the slide title/footer in place.
-    draw.rectangle((0, 0, width, title_h), fill=(213, 102, 0, 255))
-    draw.text((24, 12), f"{title}｜中文替换版｜样本 {index + 1}/5", font=FONT_TITLE, fill=(255, 255, 255))
-    draw.rectangle((0, footer_top, width, height), fill=(213, 102, 0, 255))
-    footer = f"来源：AB 图表百科｜第 {chart.get('page', '')} 页｜英文说明已用中文覆盖"
-    draw.text((20, footer_top + 8), footer, font=FONT_TINY, fill=(255, 248, 235))
-
-    candidate_panels = [
-        ((0.035, 0.112, 0.530, 0.245), "背景", "background", (15, 118, 110)),
-        ((0.580, 0.112, 0.965, 0.300), "触发", "trigger", (37, 99, 168)),
-        ((0.620, 0.305, 0.960, 0.440), "风控", "plan", (169, 111, 23)),
-        ((0.025, 0.665, 0.335, 0.900), "风险", "risk", (201, 79, 54)),
-        ((0.335, 0.785, 0.770, 0.930), "结论", "summary", (15, 118, 110)),
-    ]
-
-    drawn_boxes: list[tuple[int, int, int, int]] = []
-    for ratio_box, label, kind, accent in candidate_panels:
-        search_box = box_from_ratio(width, height, ratio_box)
-        if not zone_has_colored_text(image, search_box):
-            continue
-        lines = panel_lines(pattern, kind)
-        search_w = search_box[2] - search_box[0]
-        search_h = search_box[3] - search_box[1]
-        text_w, text_h = text_block_size(draw, label, lines, min(search_w, 420), search_h)
-        box = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, drawn_boxes)
-        draw_translation_panel(draw, box, label, lines, accent)
-        drawn_boxes.append(box)
-
-    if not drawn_boxes:
-        search_box = box_from_ratio(width, height, (0.035, 0.115, 0.530, 0.255))
-        lines = panel_lines(pattern, "background")
-        text_w, text_h = text_block_size(draw, "背景", lines, min(search_box[2] - search_box[0], 420), search_box[3] - search_box[1])
-        fallback = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, [])
-        draw_translation_panel(draw, fallback, "背景", lines, (15, 118, 110))
-
-    return Image.alpha_composite(result, overlay).convert("RGB")
-
-
-def boxes_overlap(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
-    ax1, ay1, ax2, ay2 = a
-    bx1, by1, bx2, by2 = b
-    return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
-
-
-def remove_colored_english_annotations(image: Image.Image) -> Image.Image:
-    """Drop colored slide annotations; keep the black/white price bars."""
-    arr = np.array(image.convert("RGB"))
-    maxc = arr.max(axis=2).astype(np.int16)
-    minc = arr.min(axis=2).astype(np.int16)
-    brightness = arr.mean(axis=2)
-    colored = ((maxc - minc) > 42) & (brightness > 55)
-    arr[colored] = [255, 255, 255]
-    return Image.fromarray(arr, "RGB")
-
-
-def scrub_slide_text_zones(image: Image.Image) -> Image.Image:
-    """Clear common prose areas after color removal, preserving dark candles."""
+def remove_colored_text_pixels_preserve_candles(image: Image.Image) -> Image.Image:
+    """Hide colored English notes without touching black/white candlesticks."""
     arr = np.array(image.convert("RGB"))
     height, width = arr.shape[:2]
-
     zones = [
-        (0, 0, width, int(height * 0.12)),
-        (0, int(height * 0.12), width, int(height * 0.94)),
-        (0, int(height * 0.88), width, height),
+        (0, int(height * 0.105), width, int(height * 0.36)),
+        (0, int(height * 0.60), width, int(height * 0.955)),
+        (int(width * 0.14), int(height * 0.26), int(width * 0.86), int(height * 0.56)),
     ]
 
     for x1, y1, x2, y2 in zones:
-        x1 = max(0, min(width, x1))
-        x2 = max(0, min(width, x2))
-        y1 = max(0, min(height, y1))
-        y2 = max(0, min(height, y2))
+        x1, y1 = max(0, x1), max(0, y1)
+        x2, y2 = min(width, x2), min(height, y2)
         if x1 >= x2 or y1 >= y2:
             continue
 
@@ -412,22 +345,23 @@ def scrub_slide_text_zones(image: Image.Image) -> Image.Image:
         minc = region.min(axis=2).astype(np.int16)
         brightness = region.mean(axis=2)
 
-        # Candles and wicks are the only original pixels kept in prose zones.
-        # Faint anti-aliased text, colored notes, EMA lines and captions become white.
-        dark_neutral = (brightness < 82) & ((maxc - minc) < 48)
-        very_dark = brightness < 52
-        keep_price_marks = dark_neutral | very_dark
-        keep_price_marks = remove_tiny_components(keep_price_marks)
-        region[~keep_price_marks] = [255, 255, 255]
+        # Colored slide prose is high-chroma. Black/white candles, wicks and
+        # neutral EMA fragments are protected explicitly; this avoids the old
+        # full-chart scrub that could delete small bars during translation.
+        seed = ((maxc - minc) > 48) & (brightness > 70)
+        text_seed = colored_text_component_mask(seed)
+        colored_text = dilate_mask(text_seed, radius=3)
+        preserve_price_marks = (brightness < 86) & ((maxc - minc) < 60)
+        region[colored_text & ~preserve_price_marks] = [255, 255, 255]
 
     return Image.fromarray(arr, "RGB")
 
 
-def remove_tiny_components(mask: np.ndarray) -> np.ndarray:
-    """Remove dust-like leftovers from anti-aliased text in scrubbed zones."""
+def colored_text_component_mask(mask: np.ndarray) -> np.ndarray:
+    """Keep only small colored components that look like letters, not chart lines."""
     height, width = mask.shape
     visited = np.zeros(mask.shape, dtype=bool)
-    cleaned = mask.copy()
+    text_mask = np.zeros(mask.shape, dtype=bool)
 
     for y in range(height):
         for x in range(width):
@@ -466,35 +400,92 @@ def remove_tiny_components(mask: np.ndarray) -> np.ndarray:
             comp_w = max_x - min_x + 1
             comp_h = max_y - min_y + 1
             area = len(pixels)
-            likely_text_dust = area <= 24 or (area <= 70 and comp_h <= 9) or (area <= 90 and comp_w <= 5)
-            if likely_text_dust:
+            fill_ratio = area / max(1, comp_w * comp_h)
+            likely_letter = (
+                2 <= comp_w <= 32
+                and 3 <= comp_h <= 34
+                and area <= 260
+                and fill_ratio <= 0.78
+            )
+            likely_small_punctuation = area <= 18 and comp_w <= 12 and comp_h <= 12
+
+            if likely_letter or likely_small_punctuation:
                 for px, py in pixels:
-                    cleaned[py, px] = False
+                    text_mask[py, px] = True
 
-    return cleaned
+    return text_mask
 
 
-def draw_box(
-    draw: ImageDraw.ImageDraw,
-    xy: tuple[int, int],
-    max_width: int,
-    label: str,
-    body: str,
-    accent: tuple[int, int, int],
-    fill: tuple[int, int, int, int] = (255, 255, 255, 230),
-) -> int:
-    x, y = xy
-    title = f"{label}："
-    body_lines = wrap_text(draw, body, FONT_SMALL, max_width - 24)
-    line_h = 22
-    height = 40 + line_h * len(body_lines)
-    draw.rounded_rectangle((x, y, x + max_width, y + height), radius=10, fill=fill, outline=accent, width=2)
-    draw.text((x + 12, y + 9), title, font=FONT_SMALL, fill=accent)
-    text_y = y + 34
-    for line in body_lines:
-        draw.text((x + 12, text_y), line, font=FONT_TINY, fill=(24, 34, 43))
-        text_y += line_h
-    return height
+def dilate_mask(mask: np.ndarray, radius: int = 1) -> np.ndarray:
+    height, width = mask.shape
+    expanded = mask.copy()
+    for dy in range(-radius, radius + 1):
+        for dx in range(-radius, radius + 1):
+            if dx == 0 and dy == 0:
+                continue
+            y_src1 = max(0, -dy)
+            y_src2 = min(height, height - dy)
+            x_src1 = max(0, -dx)
+            x_src2 = min(width, width - dx)
+            y_dst1 = max(0, dy)
+            y_dst2 = min(height, height + dy)
+            x_dst1 = max(0, dx)
+            x_dst2 = min(width, width + dx)
+            expanded[y_dst1:y_dst2, x_dst1:x_dst2] |= mask[y_src1:y_src2, x_src1:x_src2]
+    return expanded
+
+
+def replace_english_with_chinese_panels(image: Image.Image, pattern: dict, chart: dict, index: int) -> Image.Image:
+    width, height = image.size
+    result = remove_colored_text_pixels_preserve_candles(image).convert("RGBA")
+    overlay = Image.new("RGBA", result.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    title_h = max(54, int(height * 0.105))
+    footer_top = int(height * 0.955)
+    title = zh_terms(pattern.get("title", "价格行为形态"))
+
+    # Replace the slide title/footer in place.
+    draw.rectangle((0, 0, width, title_h), fill=(213, 102, 0, 255))
+    draw.text((24, 12), f"{title}｜中文替换版｜样本 {index + 1}/5", font=FONT_TITLE, fill=(255, 255, 255))
+    draw.rectangle((0, footer_top, width, height), fill=(213, 102, 0, 255))
+    footer = f"来源：艾尔布鲁克斯图表百科｜第 {chart.get('page', '')} 页｜英文说明已用中文覆盖"
+    draw.text((20, footer_top + 8), footer, font=FONT_TINY, fill=(255, 248, 235))
+
+    candidate_panels = [
+        ((0.035, 0.112, 0.530, 0.245), "背景", "background", (15, 118, 110)),
+        ((0.580, 0.112, 0.965, 0.300), "触发", "trigger", (37, 99, 168)),
+        ((0.620, 0.305, 0.960, 0.440), "风控", "plan", (169, 111, 23)),
+        ((0.025, 0.665, 0.335, 0.900), "风险", "risk", (201, 79, 54)),
+        ((0.335, 0.785, 0.770, 0.930), "结论", "summary", (15, 118, 110)),
+    ]
+
+    drawn_boxes: list[tuple[int, int, int, int]] = []
+    for ratio_box, label, kind, accent in candidate_panels:
+        search_box = box_from_ratio(width, height, ratio_box)
+        if not zone_has_colored_text(image, search_box):
+            continue
+        lines = panel_lines(pattern, kind)
+        search_w = search_box[2] - search_box[0]
+        search_h = search_box[3] - search_box[1]
+        text_w, text_h = text_block_size(draw, label, lines, min(search_w, 420), search_h)
+        box = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, drawn_boxes)
+        draw_translation_panel(draw, box, label, lines, accent)
+        drawn_boxes.append(box)
+
+    if not drawn_boxes:
+        search_box = box_from_ratio(width, height, (0.035, 0.115, 0.530, 0.255))
+        lines = panel_lines(pattern, "background")
+        text_w, text_h = text_block_size(draw, "背景", lines, min(search_box[2] - search_box[0], 420), search_box[3] - search_box[1])
+        fallback = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, [])
+        draw_translation_panel(draw, fallback, "背景", lines, (15, 118, 110))
+
+    return Image.alpha_composite(result, overlay).convert("RGB")
+
+
+def boxes_overlap(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 
 
 def annotate(pattern: dict, chart: dict, index: int) -> None:
