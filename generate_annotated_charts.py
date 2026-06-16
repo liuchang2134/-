@@ -43,6 +43,8 @@ FONT_TITLE = font(26, True)
 FONT_BODY = font(20)
 FONT_SMALL = font(17)
 FONT_TINY = font(15)
+FONT_MICRO = font(13)
+FONT_NANO = font(12)
 
 
 def text_width(draw: ImageDraw.ImageDraw, text: str, fnt: ImageFont.FreeTypeFont) -> int:
@@ -73,16 +75,12 @@ def first(value, fallback: str) -> str:
     return fallback
 
 
-def short(text: str, limit: int) -> str:
-    return text if len(text) <= limit else text[:limit] + "..."
-
-
 def zh_terms(text: str) -> str:
     replacements = [
-        ("Always In Long", "多头控制"),
-        ("Always In Short", "空头控制"),
-        ("Always In", "控制权"),
-        ("Brooks", "布鲁克斯"),
+        ("Always In Long", "Always In 多头"),
+        ("Always In Short", "Always In 空头"),
+        ("Always In", "Always In"),
+        ("Brooks", "Brooks"),
         ("Breakout Mode", "突破模式"),
         ("Breakout Pullback", "突破回踩"),
         ("Breakout", "突破"),
@@ -98,8 +96,8 @@ def zh_terms(text: str) -> str:
         ("Low 2", "第二次下破"),
         ("High 1", "第一次上破"),
         ("Low 1", "第一次下破"),
-        ("Signal Bar", "信号蜡烛"),
-        ("Entry Bar", "入场蜡烛"),
+        ("Signal Bar", "信号K"),
+        ("Entry Bar", "入场K"),
         ("Signal", "信号"),
         ("Entry", "入场"),
         ("Final Flag", "末端旗形"),
@@ -119,6 +117,132 @@ def zh_terms(text: str) -> str:
     for old, new in replacements:
         result = result.replace(old, new)
     return result
+
+
+def display_title(text: str) -> str:
+    """Translate chart titles and remove duplicate bilingual remnants."""
+    translated = zh_terms(text)
+    parts = [part.strip() for part in re.split(r"\s*/\s*", translated) if part.strip()]
+    unique: list[str] = []
+    for part in parts:
+        if part not in unique:
+            unique.append(part)
+    return " / ".join(unique) if unique else translated
+
+
+def pa_cn(text: str) -> str:
+    """Polish source notes into concise price-action Chinese."""
+    result = zh_terms(text)
+    replacements = [
+        ("清晰支撑阻力、区间高低点或趋势线被突破", "关键支撑/阻力被有效突破"),
+        ("突破K实体大，收盘靠近极端", "突破K实体大，收盘强"),
+        ("后续1-3根K没有立刻回到原区间", "后续1-3根K不回到区间"),
+        ("突破收盘后顺势入场", "突破收盘后顺势入场"),
+        ("等待第一次小回调或突破回踩入场", "等第一次回调或突破回踩"),
+        ("强趋势日可用小仓位追随", "强趋势日小仓位跟随"),
+        ("突破前价位明显", "突破位明确"),
+        ("突破后有跟随", "突破后有跟随"),
+        ("回踩不深，且没有强反向收盘", "回踩浅，且无强反向收盘"),
+        ("Always In 多头 清晰", "Always In 多头清晰"),
+        ("Always In 空头 清晰", "Always In 空头清晰"),
+        ("回调两段但没有破坏趋势", "两段回调未破坏趋势"),
+        ("第二次向上触发买入", "第二次上破触发买入"),
+        ("第二次向下触发卖出", "第二次下破触发卖出"),
+        ("信号K高点上方买入", "突破信号K高点买入"),
+        ("信号K低点下方卖出", "跌破信号K低点卖出"),
+        ("用信号K高/低点触发", "突破信号K触发"),
+        ("回踩突破点后顺突破方向入场", "回踩突破点后顺势入场"),
+        ("回踩低/高点外", "回踩极点外"),
+        ("回调低点下方", "回调低点下方"),
+        ("回调高点上方", "回调高点上方"),
+        ("通道低买/高卖取决于方向", "通道低买高卖要看方向"),
+        ("觉得太高/太低就逆势", "只因觉得太高太低就逆势"),
+        ("跌/突破旗形另一侧后入场", "破旗形另一侧后反向入场"),
+        ("跌/突破信号K另一端", "破信号K另一侧后反向"),
+        ("上方/下方有明显目标", "上下方有明显磁力位"),
+        ("中间阻力/支撑少", "中间阻力或支撑少"),
+        ("区间中线/另一侧", "区间中线或另一侧"),
+        ("交易区间中间硬数H2", "交易区间中间不要硬数H2"),
+        ("把区间中间波动当L2", "区间中间不要硬数L2"),
+        ("突破K另一端", "突破K另一侧"),
+        ("信号K另一端", "信号K另一侧"),
+        ("缺口另一侧", "缺口另一侧"),
+        ("突破点另一侧", "突破点另一侧"),
+        ("测量移动", "测量目标"),
+        ("下一个磁力位", "下一个磁力位"),
+        ("至少先看1R，再根据跟随决定是否波段", "先看1R，再看跟随决定是否波段"),
+        ("背景不成立时放弃，不在区间中间追单", "背景不成立就放弃，不在区间中间追单"),
+        ("趋势已经坏掉仍买", "趋势结构已坏仍买入"),
+        ("趋势结构坏掉仍买", "趋势结构已坏仍买入"),
+        ("反弹已转多仍卖", "反弹转强仍卖出"),
+        ("反弹转强仍卖", "反弹转强仍卖出"),
+        ("信号K太大导致风险收益差", "信号K过大，盈亏比变差"),
+        ("目标太近仍追单", "空间不足仍追单"),
+        ("突破后没有跟随仍死扛", "突破无跟随仍死扛"),
+        ("不要默认大波段", "不默认大波段"),
+        ("EMA被当成魔法线", "不要把EMA当魔法线"),
+        ("第三推失败后买入", "第三推失败后买入"),
+        ("第三推失败后卖出", "第三推失败后卖出"),
+        ("没有形成强多头跟随", "多头跟随不足"),
+        ("若反弹突破趋势线并跟随则放弃", "反弹破线并跟随就放弃"),
+        ("在支撑位上方空间不足", "支撑上方空间不足"),
+    ]
+    for old, new in replacements:
+        result = result.replace(old, new)
+    result = re.sub(r"\s+", " ", result).strip()
+    result = result.replace(" ,", "，").replace(",", "，")
+    return result
+
+
+def compact_chart_note(text: str) -> str:
+    """Short complete sentences for in-chart overlays."""
+    result = pa_cn(text)
+    replacements = [
+        ("关键支撑/阻力被有效突破", "关键位被有效突破"),
+        ("突破位明确", "突破位明确"),
+        ("回踩浅，且无强反向收盘", "回踩浅，无强反向"),
+        ("突破K实体大，收盘强", "突破K大，强收盘"),
+        ("后续1-3根K不回到区间", "后续K线不回区间"),
+        ("突破收盘后顺势入场", "突破收盘顺势入场"),
+        ("等第一次回调或突破回踩", "等首次回调/回踩"),
+        ("强趋势日小仓位跟随", "强趋势小仓位跟随"),
+        ("Always In 多头清晰", "Always In 多头清晰"),
+        ("Always In 空头清晰", "Always In 空头清晰"),
+        ("两段回调未破坏趋势", "两段回调未破趋势"),
+        ("反弹两段但没有形成强多头跟随", "两段反弹，多头跟随弱"),
+        ("第二次上破信号K质量好", "二次上破信号K好"),
+        ("第二次下破信号K质量好", "二次下破信号K好"),
+        ("第二次上破触发买入", "二次上破买入"),
+        ("第二次下破触发卖出", "二次下破卖出"),
+        ("突破信号K高点买入", "上破信号K买入"),
+        ("跌破信号K低点卖出", "下破信号K卖出"),
+        ("交易区间中间不要硬数H2", "区间中段不硬数H2"),
+        ("区间中间不要硬数L2", "区间中段不硬数L2"),
+        ("趋势结构已坏仍买入", "趋势已坏仍买入"),
+        ("反弹转强仍卖出", "反弹转强仍卖出"),
+        ("信号K过大，盈亏比变差", "信号K过大，盈亏比差"),
+        ("测量目标", "测量目标"),
+        ("下一个磁力位", "下一磁力位"),
+        ("先看1R，再看跟随决定是否波段", "先看1R，再看跟随"),
+        ("区间中间的假突破", "区间中段假突破"),
+        ("高潮末端追单", "高潮末端追价"),
+        ("突破无跟随仍死扛", "突破无跟随仍硬扛"),
+        ("破旗形另一侧后反向入场", "破旗形另一侧反向"),
+        ("破信号K另一侧后反向", "破信号K另一侧反向"),
+        ("通道低买高卖要看方向", "通道低买高卖看方向"),
+        ("只因觉得太高太低就逆势", "凭感觉高低就逆势"),
+        ("上下方有明显磁力位", "上下方有磁力位"),
+        ("中间阻力或支撑少", "中间阻力/支撑少"),
+        ("背景不成立就放弃，不在区间中间追单", "背景不成立就放弃"),
+        ("顺趋势回调，背景比机械数K更重要", "顺趋势回调，背景比数K重要"),
+        ("反转是过程，等破线、测试失败和二次信号", "反转要等破线、测试和二次信号"),
+        ("三推只代表动能衰竭，仍要等触发", "三推提示衰竭，仍等触发"),
+        ("关键看突破后的跟随，而不是只看突破K", "关键看突破后的跟随"),
+        ("区间优先买低卖高，突破没有跟随就降级", "区间先买低卖高"),
+    ]
+    for old, new in replacements:
+        result = result.replace(old, new)
+    return result.rstrip("。；;，,").strip()
 
 
 def looks_like_viewer_sidebar(image: Image.Image) -> bool:
@@ -168,9 +292,9 @@ def clean_source_image(image: Image.Image, pattern: dict, chart: dict, index: in
 
 def as_list(value) -> list[str]:
     if isinstance(value, list):
-        return [zh_terms(str(item)) for item in value if item]
+        return [pa_cn(str(item)) for item in value if item]
     if value:
-        return [zh_terms(str(value))]
+        return [pa_cn(str(value))]
     return []
 
 
@@ -180,22 +304,64 @@ def panel_lines(pattern: dict, kind: str) -> list[str]:
     stop = as_list(pattern.get("stop"))
     target = as_list(pattern.get("target"))
     traps = as_list(pattern.get("traps"))
-    summary = zh_terms(pattern.get("summary", "先判断市场背景，再找信号K和入场K。"))
+    summary = pa_cn(pattern.get("summary", "先判断市场背景，再找信号K和入场K。"))
 
     if kind == "background":
-        return best[:2] or [summary]
+        return chart_safe_lines(best[:2] or [summary], limit=2)
     if kind == "trigger":
-        return entry[:2] or ["等待信号K收盘确认，再考虑入场"]
+        return chart_safe_lines(entry[:2] or ["等待信号K收盘确认，再考虑入场"], limit=2)
     if kind == "plan":
-        return [
+        return chart_safe_lines([
             f"止损：{stop[0] if stop else '放在结构外'}",
             f"目标：{target[0] if target else '先看1R或下一个磁力位'}",
-        ]
+        ], limit=2)
     if kind == "risk":
-        return traps[:2] or ["背景不成立时放弃，不在区间中间追单"]
+        return chart_safe_lines(traps[:2] or ["背景不成立时放弃，不在区间中间追单"], limit=2)
     if kind == "summary":
-        return [summary]
+        return chart_safe_lines([family_chart_summary(pattern, summary)], limit=2)
     return ["用中文替换原图英文说明，按背景、触发、风险、目标阅读"]
+
+
+def chart_safe_lines(lines: list[str], limit: int = 2) -> list[str]:
+    cleaned = [compact_chart_note(line) for line in lines if line]
+    cleaned = [line.rstrip("。；;，,") for line in cleaned]
+    return cleaned[:limit] or ["先看背景，再等信号K触发"]
+
+
+def family_chart_summary(pattern: dict, fallback: str) -> str:
+    family = pattern.get("family", "")
+    if family == "突破":
+        return "关键看突破后的跟随，而不是只看突破K"
+    if family == "回调":
+        return "顺趋势回调，背景比机械数K更重要"
+    if family == "交易区间":
+        return "区间优先买低卖高，突破没有跟随就降级"
+    if family == "通道":
+        return "紧密通道顺势，宽通道按双向交易管理"
+    if family == "反转/MTR":
+        return "反转是过程，等破线、测试失败和二次信号"
+    if family == "楔形":
+        return "三推只代表动能衰竭，仍要等触发"
+    if family == "缺口":
+        return "缺口要看是否回补，未回补才有测量意义"
+    if family == "K线信号":
+        return "信号K必须服从背景和位置"
+    return fallback
+
+
+def footer_sections(pattern: dict) -> list[tuple[str, str]]:
+    best = as_list(pattern.get("best"))
+    entry = as_list(pattern.get("entry"))
+    stop = as_list(pattern.get("stop"))
+    target = as_list(pattern.get("target"))
+    traps = as_list(pattern.get("traps"))
+    return [
+        ("背景", first(best, pa_cn(pattern.get("summary", "先判断市场背景")))),
+        ("触发", first(entry, "等待信号K触发")),
+        ("止损", first(stop, "放在结构外")),
+        ("目标", first(target, "先看1R，再看磁力位")),
+        ("失效", first(traps, "背景不成立就放弃")),
+    ]
 
 
 def box_from_ratio(width: int, height: int, ratio_box: tuple[float, float, float, float]) -> tuple[int, int, int, int]:
@@ -227,25 +393,45 @@ def draw_translation_panel(
 ) -> None:
     x1, y1, x2, y2 = box
     pad = 8
-    # No visible box: the background is cleaned before this step, so only text
-    # is drawn here.
-    draw.text((x1 + pad, y1 + 4), f"{label}：", font=FONT_SMALL, fill=accent)
-
     max_width = max(80, x2 - x1 - pad * 2)
     max_height = max(20, y2 - y1 - 28)
-    line_h = 20
-    max_lines = max(1, max_height // line_h)
-    wrapped: list[str] = []
-    for line in lines:
-        wrapped.extend(wrap_text(draw, line, FONT_TINY, max_width))
-    if len(wrapped) > max_lines:
-        wrapped = wrapped[:max_lines]
-        wrapped[-1] = short(wrapped[-1], max(1, len(wrapped[-1]) - 1))
+    fnt, line_h, wrapped = fit_wrapped_lines(draw, lines, max_width, max_height)
+    widths = [text_width(draw, f"{label}：", FONT_SMALL)]
+    widths.extend(text_width(draw, line, fnt) for line in wrapped)
+    bg_w = min(x2 - x1, max(widths, default=120) + pad * 2 + 8)
+    bg_h = min(y2 - y1, 30 + max(1, len(wrapped)) * line_h + 6)
+    draw.rectangle((x1 + 2, y1 + 1, x1 + 2 + bg_w, y1 + 1 + bg_h), fill=(255, 255, 255, 238))
 
+    draw.text((x1 + pad, y1 + 4), f"{label}：", font=FONT_SMALL, fill=accent)
     text_y = y1 + 28
     for line in wrapped:
-        draw.text((x1 + pad, text_y), line, font=FONT_TINY, fill=(24, 34, 43))
+        draw.text((x1 + pad, text_y), line, font=fnt, fill=(24, 34, 43))
         text_y += line_h
+
+
+def fit_wrapped_lines(
+    draw: ImageDraw.ImageDraw,
+    lines: list[str],
+    max_width: int,
+    max_height: int,
+) -> tuple[ImageFont.FreeTypeFont, int, list[str]]:
+    candidates = [(FONT_TINY, 20), (FONT_MICRO, 17), (FONT_NANO, 15)]
+    prepared = [compact_chart_note(line) for line in lines if line]
+    for fnt, line_h in candidates:
+        max_lines = max(1, max_height // line_h)
+        selected: list[str] = []
+        for line in prepared:
+            wrapped = wrap_text(draw, line, fnt, max_width)
+            if len(selected) + len(wrapped) <= max_lines:
+                selected.extend(wrapped)
+        if selected:
+            return fnt, line_h, selected
+
+    # Last-resort fallback uses a complete, compact note instead of cutting a
+    # sentence in half.
+    fnt, line_h = candidates[-1]
+    fallback = compact_chart_note(prepared[0] if prepared else "先看背景，再等信号K触发")
+    return fnt, line_h, wrap_text(draw, fallback, fnt, max_width)
 
 
 def text_block_size(
@@ -256,14 +442,9 @@ def text_block_size(
     max_height: int,
 ) -> tuple[int, int]:
     pad = 8
-    line_h = 20
-    wrapped: list[str] = []
-    for line in lines:
-        wrapped.extend(wrap_text(draw, line, FONT_TINY, max_width - pad * 2))
-    max_lines = max(1, (max_height - 28) // line_h)
-    wrapped = wrapped[:max_lines]
+    fnt, line_h, wrapped = fit_wrapped_lines(draw, lines, max_width - pad * 2, max_height - 28)
     widths = [text_width(draw, f"{label}：", FONT_SMALL)]
-    widths.extend(text_width(draw, line, FONT_TINY) for line in wrapped)
+    widths.extend(text_width(draw, line, fnt) for line in wrapped)
     block_w = min(max_width, max(widths, default=120) + pad * 2)
     block_h = min(max_height, 28 + line_h * max(1, len(wrapped)))
     return max(120, block_w), max(48, block_h)
@@ -315,6 +496,7 @@ def remove_colored_text_pixels_preserve_candles(image: Image.Image) -> Image.Ima
     height, width = arr.shape[:2]
     zones = [
         (0, int(height * 0.105), width, int(height * 0.36)),
+        (0, int(height * 0.34), width, int(height * 0.66)),
         (0, int(height * 0.60), width, int(height * 0.955)),
         (int(width * 0.14), int(height * 0.26), int(width * 0.86), int(height * 0.56)),
     ]
@@ -335,7 +517,7 @@ def remove_colored_text_pixels_preserve_candles(image: Image.Image) -> Image.Ima
         # full-chart scrub that could delete small bars during translation.
         seed = ((maxc - minc) > 48) & (brightness > 70)
         text_seed = colored_text_component_mask(seed)
-        colored_text = dilate_mask(text_seed, radius=3)
+        colored_text = dilate_mask(text_seed, radius=5)
         preserve_price_marks = (brightness < 86) & ((maxc - minc) < 60)
         region[colored_text & ~preserve_price_marks] = [255, 255, 255]
 
@@ -387,9 +569,9 @@ def colored_text_component_mask(mask: np.ndarray) -> np.ndarray:
             area = len(pixels)
             fill_ratio = area / max(1, comp_w * comp_h)
             likely_letter = (
-                2 <= comp_w <= 32
+                2 <= comp_w <= 72
                 and 3 <= comp_h <= 34
-                and area <= 260
+                and area <= 620
                 and fill_ratio <= 0.78
             )
             likely_small_punctuation = area <= 18 and comp_w <= 12 and comp_h <= 12
@@ -427,7 +609,7 @@ def replace_english_with_chinese_panels(image: Image.Image, pattern: dict, chart
     draw = ImageDraw.Draw(overlay)
     title_h = max(54, int(height * 0.105))
     footer_top = int(height * 0.955)
-    title = zh_terms(pattern.get("title", "价格行为形态"))
+    title = display_title(pattern.get("title", "价格行为形态"))
 
     # Replace the slide title/footer in place.
     draw.rectangle((0, 0, width, title_h), fill=(213, 102, 0, 255))
@@ -437,15 +619,21 @@ def replace_english_with_chinese_panels(image: Image.Image, pattern: dict, chart
     draw.text((20, footer_top + 8), footer, font=FONT_TINY, fill=(255, 248, 235))
 
     candidate_panels = [
-        ((0.035, 0.112, 0.530, 0.245), "背景", "background", (15, 118, 110)),
-        ((0.580, 0.112, 0.965, 0.300), "触发", "trigger", (37, 99, 168)),
-        ((0.620, 0.305, 0.960, 0.440), "风控", "plan", (169, 111, 23)),
-        ((0.025, 0.665, 0.335, 0.900), "风险", "risk", (201, 79, 54)),
-        ((0.335, 0.785, 0.770, 0.930), "结论", "summary", (15, 118, 110)),
+        ((0.035, 0.112, 0.560, 0.285), "背景", "background", (15, 118, 110)),
+        ((0.555, 0.112, 0.965, 0.320), "触发", "trigger", (37, 99, 168)),
+        ((0.035, 0.315, 0.545, 0.560), "背景", "background", (15, 118, 110)),
+        ((0.535, 0.315, 0.965, 0.575), "风控", "plan", (169, 111, 23)),
+        ((0.030, 0.545, 0.440, 0.780), "风险", "risk", (201, 79, 54)),
+        ((0.430, 0.545, 0.965, 0.785), "结论", "summary", (15, 118, 110)),
+        ((0.025, 0.760, 0.440, 0.930), "风险", "risk", (201, 79, 54)),
+        ((0.335, 0.760, 0.880, 0.930), "结论", "summary", (15, 118, 110)),
     ]
 
     drawn_boxes: list[tuple[int, int, int, int]] = []
+    drawn_kinds: set[str] = set()
     for ratio_box, label, kind, accent in candidate_panels:
+        if kind in drawn_kinds:
+            continue
         search_box = box_from_ratio(width, height, ratio_box)
         if not zone_has_colored_text(image, search_box):
             continue
@@ -456,6 +644,7 @@ def replace_english_with_chinese_panels(image: Image.Image, pattern: dict, chart
         box = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, drawn_boxes)
         draw_translation_panel(draw, box, label, lines, accent)
         drawn_boxes.append(box)
+        drawn_kinds.add(kind)
 
     if not drawn_boxes:
         search_box = box_from_ratio(width, height, (0.035, 0.115, 0.530, 0.255))
@@ -473,6 +662,72 @@ def boxes_overlap(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) ->
     return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 
 
+def footer_layout(draw: ImageDraw.ImageDraw, width: int, sections: list[tuple[str, str]]) -> tuple[int, list[dict]]:
+    margin = 22
+    gap = 12
+    columns = 5 if width >= 980 else 3
+    col_w = max(120, (width - margin * 2 - gap * (columns - 1)) // columns)
+    line_h = 18
+    label_h = 23
+    top_y = 58
+    layouts: list[dict] = []
+    row_heights: list[int] = []
+
+    for idx, (label, text) in enumerate(sections):
+        row = idx // columns
+        col = idx % columns
+        wrapped = wrap_text(draw, pa_cn(text), FONT_MICRO, col_w)
+        block_h = label_h + max(1, len(wrapped)) * line_h
+        while len(row_heights) <= row:
+            row_heights.append(0)
+        row_heights[row] = max(row_heights[row], block_h)
+        layouts.append({
+            "row": row,
+            "col": col,
+            "label": label,
+            "lines": wrapped,
+            "block_h": block_h,
+        })
+
+    row_tops: list[int] = []
+    y = top_y
+    for row_h in row_heights:
+        row_tops.append(y)
+        y += row_h + 14
+
+    for item in layouts:
+        item["x"] = margin + item["col"] * (col_w + gap)
+        item["y"] = row_tops[item["row"]]
+        item["w"] = col_w
+
+    footer_h = max(150, y + 18)
+    return footer_h, layouts
+
+
+def draw_structured_footer(
+    draw: ImageDraw.ImageDraw,
+    footer_y: int,
+    width: int,
+    footer_h: int,
+    layouts: list[dict],
+    pattern: dict,
+) -> None:
+    dark = (20, 33, 43)
+    draw.rectangle((0, footer_y, width, footer_y + footer_h), fill=(255, 255, 255))
+    draw.line((0, footer_y, width, footer_y), fill=(219, 227, 234), width=2)
+    draw.text((22, footer_y + 14), "读图顺序：背景 → 位置 → 信号K → 入场K → 风险收益 → 失效", font=FONT_BODY, fill=dark)
+    for item in layouts:
+        x = item["x"]
+        y = footer_y + item["y"]
+        draw.text((x, y), f"{item['label']}：", font=FONT_SMALL, fill=(15, 118, 110))
+        text_y = y + 23
+        for line in item["lines"]:
+            draw.text((x, text_y), line, font=FONT_MICRO, fill=(82, 100, 121))
+            text_y += 18
+    note = f"中文标注按 Brooks 价格行为语境整理；胜率口径：{pattern.get('winRate', '条件型')}。"
+    draw.text((22, footer_y + footer_h - 26), note, font=FONT_TINY, fill=(101, 115, 129))
+
+
 def annotate(pattern: dict, chart: dict, index: int) -> bool:
     raw_src = ROOT / chart["src"]
     out_src = ROOT / chart["src"].replace("assets/ab-charts/", "assets/ab-charts-annotated/").replace(".jpg", "-annotated.jpg")
@@ -486,7 +741,9 @@ def annotate(pattern: dict, chart: dict, index: int) -> bool:
             return False
         width, height = image.size
         header_h = 78
-        footer_h = 118
+        temp_footer = Image.new("RGB", (width, 10), (255, 255, 255))
+        temp_draw = ImageDraw.Draw(temp_footer)
+        footer_h, footer_items = footer_layout(temp_draw, width, footer_sections(pattern))
         canvas = Image.new("RGB", (width, height + header_h + footer_h), (246, 248, 250))
         canvas.paste(image, (0, header_h))
 
@@ -496,24 +753,14 @@ def annotate(pattern: dict, chart: dict, index: int) -> bool:
     dark = (20, 33, 43)
 
     draw.rectangle((0, 0, width, header_h), fill=dark)
-    pattern_title = zh_terms(pattern["title"])
+    pattern_title = display_title(pattern["title"])
     title = f"中文标注版｜{pattern_title}｜胜率口径 {pattern.get('winRate', '条件型')}｜样本 {index + 1}/5"
     draw.text((22, 16), title, font=FONT_TITLE, fill=(255, 255, 255))
     source = f"来源：图表百科 · 第 {chart.get('page', '')} 页"
     draw.text((22, 50), source, font=FONT_TINY, fill=(201, 218, 224))
 
-    trap = short(zh_terms(first(pattern.get("traps"), "背景不成立时放弃。")), 52)
-
     footer_y = header_h + height
-    draw.rectangle((0, footer_y, width, footer_y + footer_h), fill=(255, 255, 255))
-    draw.line((0, footer_y, width, footer_y), fill=(219, 227, 234), width=2)
-    draw.text((22, footer_y + 14), "读图顺序：1 背景 → 2 位置 → 3 信号蜡烛 → 4 入场蜡烛 → 5 风险收益 → 6 失效", font=FONT_BODY, fill=dark)
-    trap_lines = wrap_text(draw, f"失效提醒：{trap}", FONT_SMALL, width - 44)
-    y = footer_y + 50
-    for line in trap_lines[:2]:
-        draw.text((22, y), line, font=FONT_SMALL, fill=(82, 100, 121))
-        y += 24
-    draw.text((max(22, width - 345), footer_y + footer_h - 28), "原图英文说明已用中文覆盖，避免重叠", font=FONT_TINY, fill=(101, 115, 129))
+    draw_structured_footer(draw, footer_y, width, footer_h, footer_items, pattern)
 
     annotated = Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
     annotated.save(out_src, quality=88, optimize=True)
