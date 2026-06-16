@@ -3278,3 +3278,109 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Encyclopedia-first information architecture. */
+.quick-nav a:first-child {
+  border-color: #94c5bf;
+  background: #e8f6f4;
+  color: var(--teal);
+}
+
+.primary-encyclopedia {
+  padding-top: 18px;
+}
+
+.primary-encyclopedia .section-heading {
+  align-items: center;
+  padding: 18px 20px;
+  border: 1px solid #b8d6d1;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.primary-encyclopedia .section-heading h2 {
+  font-size: 32px;
+}
+
+.primary-encyclopedia .section-heading .eyebrow {
+  color: var(--teal);
+}
+
+.primary-encyclopedia .encyclopedia-controls {
+  border-color: #b8d6d1;
+  background: #f6fbfa;
+}
+
+.primary-encyclopedia .encyclopedia-layout {
+  grid-template-columns: minmax(430px, 0.8fr) minmax(0, 1.2fr);
+}
+
+.academy-route-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.academy-continue {
+  border-left: 4px solid var(--teal);
+}
+
+.course-intro {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.course-intro h2,
+.course-intro p {
+  margin: 0;
+}
+
+.course-intro h2 {
+  font-size: 23px;
+}
+
+.course-intro p:last-child {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.auxiliary-course {
+  padding-top: 8px;
+}
+
+#core-theory .section-heading,
+#video-library .section-heading,
+#materials .section-heading,
+#glossary .section-heading {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 1180px) {
+  .academy-route-grid,
+  .primary-encyclopedia .encyclopedia-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .course-intro {
+    display: grid;
+  }
+}
+
+@media (max-width: 720px) {
+  .academy-route-grid,
+  .primary-encyclopedia .encyclopedia-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .primary-encyclopedia .section-heading h2 {
+    font-size: 26px;
+  }
+}

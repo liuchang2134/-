@@ -920,6 +920,15 @@ function bindEvents() {
   $("#prevLesson").addEventListener("click", () => goLesson(state.lesson - 1));
   $("#nextLesson").addEventListener("click", () => goLesson(state.lesson + 1));
   $("#openPatternLab").addEventListener("click", () => $("#encyclopedia").scrollIntoView({ behavior: "smooth" }));
+  $$("[data-encyclopedia-sort]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      state.encyclopediaSort = link.dataset.encyclopediaSort;
+      $("#encyclopediaSort").value = state.encyclopediaSort;
+      renderEncyclopedia();
+      $("#encyclopedia").scrollIntoView({ behavior: "smooth" });
+    });
+  });
   $("#encyclopediaSort").addEventListener("change", (event) => {
     state.encyclopediaSort = event.target.value;
     renderEncyclopedia();
@@ -980,17 +989,18 @@ function goLesson(index) {
 }
 
 function renderHome() {
-  const chartCount = Object.values(abChartImages).flat().length;
+  const chartCount = Object.values(abChartImages).flatMap((items) => normalizeChartItems(items)).length;
   const stats = siteData.stats || {};
-  const lesson = lessons[state.lesson] || lessons[0];
-  const nextLesson = lessons[Math.min(state.lesson + 1, lessons.length - 1)] || lesson;
-  const progress = Math.round(((state.lesson + 1) / lessons.length) * 100);
+  const topPatterns = [...encyclopediaPatterns]
+    .sort((a, b) => (b.probScore + b.importance) - (a.probScore + a.importance))
+    .slice(0, 3);
+  const leadPattern = topPatterns[0] || encyclopediaPatterns[0];
 
   $("#homeStats").innerHTML = [
-    ["系统课程", `${lessons.length} 课`, "从市场周期到交易管理"],
-    ["形态百科", `${encyclopediaPatterns.length} 个`, "按胜率和重要性排序"],
-    ["AB 原图", `${formatNumber(chartCount)} 张`, "已移除章节封面类占位图"],
-    ["字幕资料", `${formatNumber(stats.subtitleFiles || 0)} 份`, "视频课摘要可检索"]
+    ["图表百科", `${encyclopediaPatterns.length} 个`, "主学习内容"],
+    ["AB 原图", `${formatNumber(chartCount)} 张`, "每个形态优先看图"],
+    ["视频讲解", `${formatNumber(stats.subtitleFiles || 0)} 份`, "作为形态解释来源"],
+    ["系统课程", `${lessons.length} 课`, "只作为辅助路径"]
   ].map(([label, value, note]) => `
     <article class="stat-card searchable" data-search="${html(`${label} ${value} ${note}`)}">
       <span>${html(label)}</span>
@@ -1001,24 +1011,24 @@ function renderHome() {
 
   $("#homeContinue").innerHTML = `
     <div class="continue-topline">
-      <span>继续学习</span>
-      <strong>${progress}%</strong>
+      <span>主工作区</span>
+      <strong>百科</strong>
     </div>
-    <div class="progress-track"><i id="homeProgressFill" style="width:${progress}%"></i></div>
-    <p>${html(lesson.title)}</p>
-    <small>${html(lesson.subtitle)}</small>
+    <p>${leadPattern ? html(leadPattern.title) : "按形态进入图表百科"}</p>
+    <small>先按胜率和重要性选择形态，再看 AB 原图、中文标注、视频课讲解和失效条件。</small>
     <div class="continue-links">
-      <a href="#course">进入当前课程</a>
-      <a href="#encyclopedia">查形态百科</a>
-      <a href="#core-theory">补核心理论</a>
+      <a href="#encyclopedia">进入图表百科</a>
+      <a href="#encyclopedia">看最高优先级</a>
+      <a href="#video-library">查视频来源</a>
     </div>
-    <span class="next-lesson">下一课：${html(nextLesson.title)}</span>
+    <span class="next-lesson">推荐顺序：形态排序 → 原图标注 → 视频总结 → 复盘。</span>
   `;
 
   $("#homeRoutes").innerHTML = [
-    ["01", "先建框架", "用核心理论建立 Brooks 的市场周期、Always In 和交易者方程。", "#core-theory"],
-    ["02", "系统学习", "按课程顺序读，不直接跳进 72 个形态里找答案。", "#course"],
-    ["03", "查形态", "需要交易结构时，再进形态百科看背景、触发、止损和原图。", "#encyclopedia"]
+    ["01", "查图表百科", "按胜率、重要性、类别和关键词快速定位形态。", "#encyclopedia"],
+    ["02", "看 AB 原图", "每个形态先看原始图表和中文标注，别先背概念。", "#encyclopedia"],
+    ["03", "读视频讲解", "用 Brooks 课程总结解释这张图为什么成立或失败。", "#video-library"],
+    ["04", "补系统课程", "不懂市场背景时，再回课程路径补框架。", "#course"]
   ].map(([step, title, text, href]) => `
     <a class="route-card searchable" href="${href}" data-search="${html(`${step} ${title} ${text}`)}">
       <span>${step}</span>
