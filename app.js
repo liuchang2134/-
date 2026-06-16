@@ -824,8 +824,6 @@ function renderEncyclopediaDetail() {
     return;
   }
   const chartItems = normalizeChartItems(abChartImages[pattern.id]);
-  const templateSections = patternTemplateSections(pattern);
-  const practiceItems = patternPracticeItems(pattern);
   const videoInsight = patternVideoInsight(pattern);
   $("#encyclopediaDetail").innerHTML = `
     <div class="pattern-hero encyclopedia-hero searchable" data-search="${html(searchText(pattern))}">
@@ -837,7 +835,7 @@ function renderEncyclopediaDetail() {
           <span class="pill">胜率分 ${pattern.probScore}</span>
           <span class="pill">重要性 ${pattern.importance}</span>
           <span class="pill">难度 ${"●".repeat(pattern.difficulty)}</span>
-          <span class="pill">统一模板</span>
+          <span class="pill">视频课总结</span>
         </div>
         <h3>${html(pattern.title)}</h3>
         <p>${html(pattern.summary)}</p>
@@ -845,24 +843,6 @@ function renderEncyclopediaDetail() {
         <div class="term-chips">${(pattern.aliases || []).map((alias) => `<span>${html(alias)}</span>`).join("")}</div>
       </div>
     </div>
-    <section class="pattern-template searchable" data-search="${html(templateSections.map((section) => `${section.title} ${section.items.join(" ")}`).join(" "))}">
-      <div class="template-heading">
-        <div>
-          <p class="eyebrow">Unified Encyclopedia Template</p>
-          <h4>统一百科模板</h4>
-        </div>
-        <span>定义 → 背景 → 触发 → 风险 → 目标 → 失效 → 训练</span>
-      </div>
-      <div class="template-grid">
-        ${templateSections.map((section) => `
-          <article class="template-card">
-            <span>${section.step}</span>
-            <h5>${html(section.title)}</h5>
-            <ul>${section.items.map((item) => `<li>${html(item)}</li>`).join("")}</ul>
-          </article>
-        `).join("")}
-      </div>
-    </section>
     ${renderPatternVideoInsight(pattern, videoInsight)}
     ${chartItems.length ? `
       <section class="ab-chart-card searchable" data-search="${html(`${pattern.title} ${chartItems.map((chart) => `${chart.caption} ${chart.source}`).join(" ")}`)}">
@@ -880,90 +860,7 @@ function renderEncyclopediaDetail() {
     ` : `
       <section class="empty-state">这个形态暂时没有匹配到 AB 原图截图。</section>
     `}
-    <section class="pattern-practice searchable" data-search="${html(practiceItems.map((item) => `${item.title} ${item.question} ${item.answer} ${item.task}`).join(" "))}">
-      <div class="template-heading">
-        <div>
-          <p class="eyebrow">Practice Questions</p>
-          <h4>练习题</h4>
-        </div>
-        <span>每个形态同一套训练闭环</span>
-      </div>
-      <div class="practice-grid">
-        ${practiceItems.map((item, index) => `
-          <article class="practice-card">
-            <span>题 ${index + 1}</span>
-            <h5>${html(item.title)}</h5>
-            <p>${html(item.question)}</p>
-            <details>
-              <summary>查看参考答案</summary>
-              <p>${html(item.answer)}</p>
-            </details>
-            <small>${html(item.task)}</small>
-          </article>
-        `).join("")}
-      </div>
-    </section>
   `;
-}
-
-function patternTemplateSections(pattern) {
-  return [
-    { step: "01", title: "定义", items: [pattern.summary] },
-    { step: "02", title: "最佳背景", items: toList(pattern.best) },
-    { step: "03", title: "入场触发", items: toList(pattern.entry) },
-    { step: "04", title: "止损位置", items: toList(pattern.stop) },
-    { step: "05", title: "目标管理", items: toList(pattern.target) },
-    { step: "06", title: "失效/陷阱", items: toList(pattern.traps) },
-    {
-      step: "07",
-      title: "训练要求",
-      items: [
-        `在 5 张 AB 标注图里逐张找出 ${pattern.title} 的背景证据。`,
-        "只统计完全符合背景、触发、止损、目标四项的样本。",
-        "把失败样本归因到：背景错、信号弱、风险收益差、过早/过晚入场。"
-      ]
-    }
-  ];
-}
-
-function patternPracticeItems(pattern) {
-  const best = firstText(pattern.best);
-  const entry = firstText(pattern.entry);
-  const stop = firstText(pattern.stop);
-  const target = firstText(pattern.target);
-  const trap = firstText(pattern.traps);
-  return [
-    {
-      title: "背景判断",
-      question: `在考虑 ${pattern.title} 前，必须先确认哪一个背景条件？`,
-      answer: best,
-      task: "在每张 AB 标注图上先找背景，不急着找入场点。"
-    },
-    {
-      title: "触发判断",
-      question: `如果背景成立，${pattern.title} 的入场触发应该怎么等？`,
-      answer: entry,
-      task: "圈出信号 K 和入场 K，并写下为什么不是提前进场。"
-    },
-    {
-      title: "风险判断",
-      question: `这类形态的结构止损通常应该放在哪里？`,
-      answer: stop,
-      task: "在图上标出止损线，再判断实际风险是否过大。"
-    },
-    {
-      title: "目标判断",
-      question: `入场后第一目标或管理目标应该优先看哪里？`,
-      answer: target,
-      task: "标出 1R、前高/前低、测量移动或下一个磁力位。"
-    },
-    {
-      title: "失效判断",
-      question: `出现什么情况时，${pattern.title} 应该放弃或判定失败？`,
-      answer: trap,
-      task: "把失败样本单独截图，归入错题本，不和成功样本混在一起。"
-    }
-  ];
 }
 
 function patternVideoInsight(pattern) {
@@ -974,57 +871,86 @@ function patternVideoInsight(pattern) {
     .map((lesson) => ({ lesson, score: lessonRelevanceScore(lesson, pattern, terms) }))
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score || b.lesson.wordUnits - a.lesson.wordUnits)
-    .slice(0, 8)
-    .map((item) => item.lesson);
-  const related = scored.length ? scored : lessons.slice(0, 8);
+    .slice(0, 10);
+  const related = scored.length ? scored.map((item) => item.lesson) : lessons.slice(0, 8);
   const bullets = uniqueOrdered(related.flatMap((lesson) => lesson.bullets || [])).slice(0, 6);
   const topics = topTopicLabels(related).slice(0, 5);
+  const primaryLesson = related[0];
+  const checklist = [
+    { label: "背景", value: firstText(pattern.best) },
+    { label: "触发", value: firstText(pattern.entry) },
+    { label: "止损", value: firstText(pattern.stop) },
+    { label: "目标", value: firstText(pattern.target) },
+    { label: "放弃", value: firstText(pattern.traps) }
+  ];
   return {
     subtitleFiles: stats.subtitleFiles || lessons.length,
     courseUnits: stats.uniqueCourseUnits || lessons.length,
+    relatedCount: scored.length || related.length,
     topics,
     bullets,
     related,
+    primaryLesson,
     thesis: familyVideoThesis(pattern),
+    patternFocus: patternCourseFocus(pattern),
+    checklist,
     sequence: [
       `先判断市场周期：趋势、通道、交易区间，不能只因为看见 ${pattern.title} 就下结论。`,
       `再确认位置：${firstText(pattern.best)}`,
       `然后等触发：${firstText(pattern.entry)}`,
       `最后检查交易者方程：止损看 ${firstText(pattern.stop)}，目标先看 ${firstText(pattern.target)}。`
     ],
+    mistakes: uniqueOrdered([
+      firstText(pattern.traps),
+      ...bullets
+    ]).slice(0, 5),
     warning: firstText(pattern.traps)
   };
 }
 
 function renderPatternVideoInsight(pattern, insight) {
   return `
-    <section class="video-insight-card searchable" data-search="${html(`${pattern.title} ${insight.thesis} ${insight.sequence.join(" ")} ${insight.bullets.join(" ")}`)}">
+    <section class="video-insight-card course-insight searchable" data-search="${html(`${pattern.title} ${insight.thesis} ${insight.patternFocus} ${insight.sequence.join(" ")} ${insight.bullets.join(" ")}`)}">
       <div class="template-heading">
         <div>
-          <p class="eyebrow">AI Summary From All Video Subtitles</p>
-          <h4>全部视频字幕 AI 综合</h4>
+          <p class="eyebrow">Al Brooks Video Course Notes</p>
+          <h4>视频课讲解总结：怎么理解 ${html(pattern.title)}</h4>
         </div>
-        <span>${formatNumber(insight.subtitleFiles)} 份字幕 / ${formatNumber(insight.courseUnits)} 个课程单元</span>
+        <span>匹配 ${formatNumber(insight.relatedCount)} 节相关课 · 全库 ${formatNumber(insight.subtitleFiles)} 份字幕</span>
       </div>
-      <div class="video-insight-layout">
-        <article>
-          <h5>Brooks 讲这个形态的核心意思</h5>
+      <div class="course-insight-main">
+        <article class="course-thesis">
+          <span>01</span>
+          <h5>Brooks 讲这类形态真正想让你抓住什么</h5>
           <p>${html(insight.thesis)}</p>
-          <p>放到 ${html(pattern.title)} 上，重点不是背形态名字，而是用视频里反复强调的顺序判断：背景、位置、信号、风险、目标和失败条件必须同时成立。</p>
+          <p>${html(insight.patternFocus)}</p>
         </article>
+        <article class="course-checklist">
+          <span>02</span>
+          <h5>套到这个形态，入场前按这 5 句检查</h5>
+          <div class="course-check-grid">
+            ${insight.checklist.map((item) => `
+              <div>
+                <strong>${html(item.label)}</strong>
+                <p>${html(item.value)}</p>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      </div>
+      <div class="course-insight-layout">
         <article>
-          <h5>字幕总结出的判断顺序</h5>
+          <h5>按课程思路读图的顺序</h5>
           <ol>${insight.sequence.map((item) => `<li>${html(item)}</li>`).join("")}</ol>
         </article>
         <article>
-          <h5>视频里反复提醒的误区</h5>
-          <p>${html(insight.warning)}</p>
-          <ul>${insight.bullets.slice(0, 4).map((item) => `<li>${html(item)}</li>`).join("")}</ul>
+          <h5>这一形态最容易学错的地方</h5>
+          <ul>${insight.mistakes.map((item) => `<li>${html(item)}</li>`).join("")}</ul>
         </article>
       </div>
       <div class="related-video-lessons">
         <div class="related-heading">
-          <h5>相关字幕课摘要</h5>
+          <h5>相关视频课摘要</h5>
           <span>${insight.topics.map((topic) => html(topic)).join(" / ")}</span>
         </div>
         <div class="related-video-grid">
@@ -1033,6 +959,7 @@ function renderPatternVideoInsight(pattern, insight) {
               <span>${html(lesson.module)} · ${html(lesson.language)}</span>
               <strong>${html(lesson.title)}</strong>
               <p>${html(lesson.summary)}</p>
+              ${(lesson.bullets || []).length ? `<ul>${lesson.bullets.slice(0, 3).map((item) => `<li>${html(item)}</li>`).join("")}</ul>` : ""}
               <small>${html((lesson.topics || []).slice(0, 4).join(" / "))}</small>
             </article>
           `).join("")}
@@ -1040,6 +967,10 @@ function renderPatternVideoInsight(pattern, insight) {
       </div>
     </section>
   `;
+}
+
+function patternCourseFocus(pattern) {
+  return `放到 ${pattern.title} 上，学习重点不是把名字背下来，而是看它是否同时满足 Brooks 反复讲的四件事：背景合适、位置有优势、触发后有跟随、风险收益划算。这个形态的第一判断句是：${firstText(pattern.best)}；真正的触发句是：${firstText(pattern.entry)}。`;
 }
 
 function patternSearchTerms(pattern) {

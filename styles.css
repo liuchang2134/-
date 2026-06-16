@@ -2272,16 +2272,6 @@ body {
   }
 }
 
-/* Encyclopedia learning template and annotated chart study mode. */
-.pattern-template,
-.pattern-practice {
-  margin-top: 14px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-}
-
 .template-heading {
   display: flex;
   align-items: flex-start;
@@ -2302,29 +2292,25 @@ body {
   text-align: right;
 }
 
-.template-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
 .video-insight-card {
   display: grid;
   gap: 14px;
   margin-top: 14px;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fbfcfa;
+  background: #fbfcfd;
 }
 
-.video-insight-layout {
+.course-insight-main,
+.course-insight-layout {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   gap: 10px;
 }
 
-.video-insight-layout article,
+.course-insight-main article,
+.course-insight-layout article,
 .related-video-card {
   min-width: 0;
   padding: 14px;
@@ -2333,23 +2319,72 @@ body {
   background: var(--surface);
 }
 
-.video-insight-layout h5,
+.course-thesis {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbfa 100%);
+}
+
+.course-thesis > span,
+.course-checklist > span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 26px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: #e7f4f2;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.course-check-grid {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.course-check-grid div {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.course-check-grid strong {
+  color: var(--teal);
+  font-size: 12px;
+}
+
+.course-check-grid p {
+  margin: 0;
+}
+
+.course-insight-layout article {
+  background: #fff;
+}
+
+.course-insight-layout h5,
+.course-insight-main h5,
 .related-heading h5,
 .related-video-card strong {
   margin: 0;
   color: var(--ink);
 }
 
-.video-insight-layout p,
-.video-insight-layout li,
+.course-insight-layout p,
+.course-insight-layout li,
+.course-insight-main p,
 .related-video-card p,
+.related-video-card li,
 .related-video-card small {
   color: var(--muted);
   line-height: 1.6;
 }
 
-.video-insight-layout ol,
-.video-insight-layout ul {
+.course-insight-layout ol,
+.course-insight-layout ul,
+.related-video-card ul {
   margin: 8px 0 0;
   padding-left: 20px;
 }
@@ -2388,35 +2423,6 @@ body {
   margin: 0;
 }
 
-.template-card,
-.practice-card {
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfcfd;
-}
-
-.template-card > span,
-.practice-card > span {
-  display: inline-grid;
-  place-items: center;
-  min-width: 34px;
-  height: 26px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  background: #e7f4f2;
-  color: var(--teal);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.template-card h5,
-.practice-card h5 {
-  margin: 0 0 8px;
-  font-size: 14px;
-}
-
-.template-card ul,
 .chart-annotation-notes {
   display: grid;
   gap: 5px;
@@ -2424,38 +2430,6 @@ body {
   padding-left: 18px;
   color: var(--muted);
   font-size: 12px;
-}
-
-.practice-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.practice-card p {
-  margin-bottom: 8px;
-  color: var(--muted);
-}
-
-.practice-card details {
-  margin: 8px 0;
-  padding: 8px;
-  border: 1px solid #d8e5e7;
-  border-radius: 6px;
-  background: #fff;
-}
-
-.practice-card summary {
-  color: var(--teal);
-  cursor: pointer;
-  font-weight: 900;
-}
-
-.practice-card small {
-  display: block;
-  color: var(--muted);
-  font-weight: 800;
-  line-height: 1.45;
 }
 
 .annotated-figure {
@@ -2510,12 +2484,6 @@ body {
   margin-top: 8px;
 }
 
-@media (max-width: 1280px) {
-  .practice-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 900px) {
   .template-heading,
   .annotated-figure figcaption {
@@ -2527,12 +2495,8 @@ body {
     text-align: left;
   }
 
-  .template-grid,
-  .practice-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .video-insight-layout,
+  .course-insight-main,
+  .course-insight-layout,
   .related-video-grid {
     grid-template-columns: 1fr;
   }
