@@ -1189,7 +1189,7 @@ function renderEncyclopediaDetail() {
           <span>${chartItems.length} 张中文标注样本</span>
         </div>
         <div class="ab-chart-gallery">
-          ${chartItems.map((chart, index) => renderAnnotatedChartFigure(pattern, chart, index)).join("")}
+          ${chartItems.map((chart, index) => renderAnnotatedChartFigure(pattern, chart, index, videoInsight)).join("")}
         </div>
       </section>
     ` : `
@@ -1527,12 +1527,12 @@ function uniqueOrdered(values) {
   });
 }
 
-function renderAnnotatedChartFigure(pattern, chart, index) {
+function renderAnnotatedChartFigure(pattern, chart, index, videoInsight) {
   const rawSrc = chart.src || "";
   const annotatedSrc = annotatedChartSrc(chart);
-  const notes = chartAnnotationNotes(pattern, chart, index);
+  const lesson = chartTeachingNote(pattern, chart, index, videoInsight);
   return `
-    <figure class="annotated-figure searchable" data-search="${html(`${pattern.title} ${notes.join(" ")} ${chart.caption || ""}`)}">
+    <figure class="annotated-figure searchable" data-search="${html(`${pattern.title} ${lesson.title} ${lesson.summary} ${lesson.points.join(" ")} ${chart.caption || ""}`)}">
       <div class="annotated-chart">
         <a href="${html(annotatedSrc)}" target="_blank" rel="noreferrer">
           <img src="${html(annotatedSrc)}" alt="${html(pattern.title)} AB 原图中文标注 ${index + 1}" ${index > 1 ? 'loading="lazy"' : ""} onerror="this.onerror=null;this.src='${html(rawSrc)}';" />
@@ -1543,21 +1543,191 @@ function renderAnnotatedChartFigure(pattern, chart, index) {
         <span>${html(chart.source)} · p.${html(chart.page)} · ${html(pattern.title)}</span>
         <a href="${html(rawSrc)}" target="_blank" rel="noreferrer">打开无标注原图</a>
       </figcaption>
-      <ul class="chart-annotation-notes">
-        ${notes.map((note) => `<li>${html(note)}</li>`).join("")}
-      </ul>
+      <div class="chart-lesson-card">
+        <div class="chart-lesson-head">
+          <span>${html(lesson.badge)}</span>
+          <strong>${html(lesson.title)}</strong>
+        </div>
+        <p>${html(lesson.summary)}</p>
+        <div class="chart-lesson-points">
+          ${lesson.points.map((point) => `<p>${html(point)}</p>`).join("")}
+        </div>
+        <small>${html(lesson.source)}</small>
+      </div>
     </figure>
   `;
 }
 
-function chartAnnotationNotes(pattern, chart, index) {
-  return [
-    `背景：${shortText(firstText(pattern.best), 32)}`,
-    `触发：${shortText(firstText(pattern.entry), 32)}`,
-    `止损：${shortText(firstText(pattern.stop), 28)}`,
-    `目标：${shortText(firstText(pattern.target), 28)}`,
-    `失效：${shortText(firstText(pattern.traps), 32)}`
+function chartTeachingNote(pattern, chart, index, videoInsight) {
+  const lens = chartLessonLens(index);
+  const family = chartFamilyPrinciple(pattern.family);
+  const related = videoInsight?.related || [];
+  const relatedLesson = related.length ? related[index % related.length] : null;
+  const relatedBullet = relatedLesson?.bullets?.length ? relatedLesson.bullets[index % relatedLesson.bullets.length] : "";
+  const source = relatedLesson
+    ? `相关视频课摘要：${relatedLesson.title}；本图来自图表百科 p.${chart.page}。`
+    : `课程来源：${pattern.source}；本图来自图表百科 p.${chart.page}。`;
+
+  return {
+    badge: `样本 ${index + 1} · ${lens.badge}`,
+    title: lens.title(pattern, family),
+    summary: lens.summary(pattern, family, index),
+    points: uniqueOrdered([
+      lens.point(pattern, family),
+      family.point(pattern, index),
+      relatedBullet ? `视频课联想：${relatedBullet}` : family.fallback(pattern)
+    ]).slice(0, 3),
+    source
+  };
+}
+
+function chartLessonLens(index) {
+  const lenses = [
+    {
+      badge: "背景",
+      title: () => "先判断形态是否出现在高质量位置",
+      summary: (pattern, family) => `Brooks 讲形态时通常先问市场环境，而不是先问名字。这张图适合练习：左侧是否已经给出 ${firstPaText(pattern.best)}，以及这个位置是否真的让 ${pattern.title} 的概率变高。`,
+      point: (pattern) => `读图动作：遮住右半边，只看入场前的背景；如果只剩形态名称而没有位置优势，这笔交易就不该升级。`
+    },
+    {
+      badge: "触发",
+      title: (pattern) => `看信号K之后有没有真正触发`,
+      summary: (pattern) => `Brooks 不会因为“看起来像”就交易，他要看到信号K和入场K。此图重点是把 ${firstPaText(pattern.entry)} 和后续跟随连起来看，而不是孤立地看一根漂亮K线。`,
+      point: (pattern) => `读图动作：找到信号K、入场K和入场后第一两根K；如果入场后没有跟随，就把预期从波段降到小目标或直接放弃。`
+    },
+    {
+      badge: "管理",
+      title: () => "把止损和目标放回同一张图里看",
+      summary: (pattern) => `这张图下面不再只背“止损、目标”，而是看交易者方程：止损若在 ${firstPaText(pattern.stop)}，目标至少要能看到 ${firstPaText(pattern.target)}，否则方向看对也可能不是好交易。`,
+      point: () => "读图动作：先量入场点到止损，再量入场点到最近磁力位；如果目标太近，Brooks 通常会降低仓位、等更好价格，或不交易。"
+    },
+    {
+      badge: "陷阱",
+      title: (pattern) => `这张图用来识别 ${pattern.title} 的失效点`,
+      summary: (pattern) => `Brooks 很重视失败形态，因为被套交易者会制造反向燃料。这里要练的是：什么情况下 ${pattern.title} 不再成立，尤其是 ${firstPaText(pattern.traps)}。`,
+      point: () => "读图动作：不要只标出理想入场，也要标出哪一根K之后你的交易理由消失；理由消失时，不要用希望代替规则。"
+    },
+    {
+      badge: "复盘",
+      title: () => "用这张图复盘 Brooks 的读图顺序",
+      summary: (pattern, family) => `这张图适合做完整复盘：先定市场周期，再看位置，等触发，最后看风险收益。${family.core} 这个顺序比单独记住 ${pattern.title} 更重要。`,
+      point: () => "读图动作：用一句话写下“为什么现在多头或空头更有优势”；写不出来，就说明图还没有读清楚。"
+    }
   ];
+  return lenses[index % lenses.length];
+}
+
+function firstPaText(value) {
+  return priceActionPhrase(firstText(value));
+}
+
+function priceActionPhrase(value) {
+  return String(value || "")
+    .replace(/清晰支撑阻力、区间高低点或趋势线被突破/g, "关键支撑/阻力被有效突破")
+    .replace(/突破K实体大，收盘靠近极端/g, "突破K实体大，收盘强")
+    .replace(/后续1-3根K没有立刻回到原区间/g, "后续K线不回到原区间")
+    .replace(/突破K另一端/g, "突破K另一侧")
+    .replace(/信号K另一端/g, "信号K另一侧")
+    .replace(/测量移动/g, "测量目标")
+    .replace(/交易区间中间硬数H2/g, "交易区间中段不要硬数H2")
+    .replace(/把区间中间波动当L2/g, "交易区间中段不要硬数L2")
+    .replace(/趋势已经坏掉仍买/g, "趋势结构已坏仍买入")
+    .replace(/反弹已转多仍卖/g, "反弹转强仍卖出")
+    .replace(/信号K太大导致风险收益差/g, "信号K过大，盈亏比变差")
+    .replace(/跌\/突破旗形另一侧后入场/g, "破旗形另一侧后反向入场")
+    .replace(/跌\/突破信号K另一端/g, "破信号K另一侧后反向")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function chartFamilyPrinciple(family) {
+  const map = {
+    "突破": {
+      core: "突破的核心不是穿过价位，而是突破后有无跟随。",
+      point: () => "原理：强突破会迫使反向交易者止损，也会吸引顺势交易者追随；没有跟随时，突破常退化成区间里的假突破。",
+      fallback: () => "课程提醒：交易区间里的多数突破会失败，只有强收盘和后续K继续推进，才值得提高预期。"
+    },
+    "回调": {
+      core: "回调形态的核心是原趋势是否仍在控制。",
+      point: () => "原理：High 2 / Low 2 表达的是逆势方两次尝试失败后，顺势方重新接管；机械数K不是入场理由。",
+      fallback: () => "课程提醒：在强趋势里，第一次和第二次回调更有价值；在区间中段，数到2也可能只是噪音。"
+    },
+    "交易区间": {
+      core: "区间里边缘比中间重要，失败突破比追突破更常见。",
+      point: () => "原理：区间内多空都能赚钱，但中间位置优势最差；Brooks 通常更重视边缘、磁力位和失败突破。",
+      fallback: () => "课程提醒：交易区间中不要默认突破成功，先按买低卖高和小目标管理。"
+    },
+    "通道": {
+      core: "通道是趋势变弱后的推进方式，容易出现双向交易。",
+      point: () => "原理：紧密通道仍偏顺势，宽通道则要尊重回撤和通道线；通道末端追单质量会下降。",
+      fallback: () => "课程提醒：通道里不要把每次触线都当反转，等测试失败或二次信号更稳。"
+    },
+    "趋势": {
+      core: "趋势图首先看 Always In 控制权。",
+      point: () => "原理：强趋势中多数反向信号只是回调；只有结构被破坏并有反向跟随，才开始考虑反转。",
+      fallback: () => "课程提醒：不要因为价格看起来太高或太低就逆势，先问现在谁控制市场。"
+    },
+    "反转/MTR": {
+      core: "主要趋势反转是一个过程，不是猜顶底。",
+      point: () => "原理：Brooks 通常要看到趋势线突破、回测原极端失败、二次信号或强反向跟随，才把反转当计划。",
+      fallback: () => "课程提醒：第一根反向K通常不够，等待结构证据能过滤很多早进场。"
+    },
+    "楔形": {
+      core: "三推说明动能衰竭，但衰竭不等于立刻反转。",
+      point: () => "原理：第三推后要看触发和跟随；顺大趋势的楔形旗形通常比逆大趋势反转更可靠。",
+      fallback: () => "课程提醒：不要只数三次推进，第三推之后没有反向跟随就仍可能继续原趋势。"
+    },
+    "末端旗形": {
+      core: "末端旗形常是趋势末端的顺势陷阱。",
+      point: () => "原理：它看起来像普通整理，但突破失败并回到旗形内时，最后一批追单者会被困住。",
+      fallback: () => "课程提醒：末端旗形要重点看突破后是否立刻失败，而不是看到旗形就顺势追。"
+    },
+    "高潮": {
+      core: "高潮后的常见结果是横盘或两段回调，不一定马上反转。",
+      point: () => "原理：连续大K和远离均线代表情绪化推进；之后市场常需要时间消化，目标要降到现实。",
+      fallback: () => "课程提醒：不要在高潮末端追最差价格，也不要默认第一根反向K就是大反转。"
+    },
+    "缺口": {
+      core: "缺口要看是否回补，未回补才有测量意义。",
+      point: () => "原理：缺口代表重新定价；如果很快回补，说明缺口方向没有控制权，若不回补并跟随，才可能成为测量缺口。",
+      fallback: () => "课程提醒：缺口本身不是入场理由，要等测试、跟随或回补失败。"
+    },
+    "开盘": {
+      core: "开盘形态要结合昨日高低点、开盘价和早盘速度。",
+      point: () => "原理：强开盘可能形成趋势日，失败开盘会迅速回到区间；早盘不要脱离磁力位读图。",
+      fallback: () => "课程提醒：开盘前几根K信息密度高，但也最容易追在情绪极端。"
+    },
+    "目标/磁力": {
+      core: "磁力位告诉你价格可能被吸引的位置，不直接告诉方向。",
+      point: () => "原理：测量目标、前高低和均线都是市场会测试的位置；到位后的突破或失败才给交易方向。",
+      fallback: () => "课程提醒：目标太近时不要硬做，因为方向正确也可能没有足够回报。"
+    },
+    "K线信号": {
+      core: "信号K只提供触发，不能脱离背景。",
+      point: () => "原理：同一根K在强趋势里可能只是噪音，在区间边缘可能是好信号；位置决定信号质量。",
+      fallback: () => "课程提醒：漂亮信号K后还要看入场K和跟随，不能只看形状。"
+    },
+    "失败形态": {
+      core: "失败形态的力量来自被困交易者。",
+      point: () => "原理：当突破或二次入场失败并快速反向时，原方向交易者的止损会推动反向运动。",
+      fallback: () => "课程提醒：失败必须有反向跟随，没有跟随只是普通震荡。"
+    },
+    "入场逻辑": {
+      core: "入场方式要匹配市场速度。",
+      point: () => "原理：止损单适合突破和强趋势，限价单更常用于区间边缘；入场后没有跟随，要快速降低预期。",
+      fallback: () => "课程提醒：先定义入场K和实际风险，再决定能不能做。"
+    },
+    "交易管理": {
+      core: "交易管理看概率、实际风险、目标距离和执行成本。",
+      point: () => "原理：看对方向不等于能赚钱，止损太远或目标太近时，交易者方程不成立。",
+      fallback: () => "课程提醒：先管理风险，再谈形态胜率。"
+    }
+  };
+  return map[family] || {
+    core: "Brooks 的读图重点是背景、位置、触发、跟随和风险收益。",
+    point: () => "原理：形态名称只是索引，真正决定交易质量的是市场周期和订单行为。",
+    fallback: () => "课程提醒：先判断市场环境，再看信号和交易者方程。"
+  };
 }
 
 function annotatedChartSrc(chart) {
