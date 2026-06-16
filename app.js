@@ -903,6 +903,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 function init() {
+  renderHome();
   renderLessonList();
   renderLesson();
   renderEncyclopediaFilters();
@@ -979,8 +980,75 @@ function goLesson(index) {
   if (index < 0 || index >= lessons.length) return;
   state.lesson = index;
   localStorage.setItem("activeLesson", String(index));
+  renderHome();
   renderLessonList();
   renderLesson();
+}
+
+function renderHome() {
+  const chartCount = Object.values(abChartImages).flat().length;
+  const stats = siteData.stats || {};
+  const lesson = lessons[state.lesson] || lessons[0];
+  const nextLesson = lessons[Math.min(state.lesson + 1, lessons.length - 1)] || lesson;
+  const progress = Math.round(((state.lesson + 1) / lessons.length) * 100);
+
+  $("#homeStats").innerHTML = [
+    ["系统课程", `${lessons.length} 课`, "从市场周期到交易管理"],
+    ["形态百科", `${encyclopediaPatterns.length} 个`, "按胜率和重要性排序"],
+    ["AB 原图", `${formatNumber(chartCount)} 张`, "已移除章节封面类占位图"],
+    ["字幕资料", `${formatNumber(stats.subtitleFiles || 0)} 份`, "视频课摘要可检索"]
+  ].map(([label, value, note]) => `
+    <article class="stat-card searchable" data-search="${html(`${label} ${value} ${note}`)}">
+      <span>${html(label)}</span>
+      <strong>${html(value)}</strong>
+      <p>${html(note)}</p>
+    </article>
+  `).join("");
+
+  $("#homeContinue").innerHTML = `
+    <div class="continue-topline">
+      <span>继续学习</span>
+      <strong>${progress}%</strong>
+    </div>
+    <div class="progress-track"><i id="homeProgressFill" style="width:${progress}%"></i></div>
+    <p>${html(lesson.title)}</p>
+    <small>${html(lesson.subtitle)}</small>
+    <div class="continue-links">
+      <a href="#course">进入当前课程</a>
+      <a href="#encyclopedia">查形态百科</a>
+      <a href="#core-theory">补核心理论</a>
+    </div>
+    <span class="next-lesson">下一课：${html(nextLesson.title)}</span>
+  `;
+
+  $("#homeRoutes").innerHTML = [
+    ["01", "建立框架", "先学市场周期、Always In、交易者方程，避免只背形态。", "#core-theory"],
+    ["02", "查形态", "按胜率和重要性查 72 个形态，直接看背景、触发、止损和目标。", "#encyclopedia"],
+    ["03", "看原图", "在每个形态里对照 Brooks 原图中文标注，练读图顺序。", "#encyclopedia"],
+    ["04", "回到字幕", "需要细节时再进入字幕库，按主题找到对应课程摘要。", "#video-library"]
+  ].map(([step, title, text, href]) => `
+    <a class="route-card searchable" href="${href}" data-search="${html(`${step} ${title} ${text}`)}">
+      <span>${step}</span>
+      <strong>${html(title)}</strong>
+      <p>${html(text)}</p>
+    </a>
+  `).join("");
+
+  $("#homeModuleGrid").innerHTML = [
+    ["课程路径", "完整学习线", "像课程一样逐课学习，不先被 72 个形态淹没。", "#course", "主线"],
+    ["形态百科", "胜率排序查表", "按 Brooks 语境整理背景、触发、管理和原图。", "#encyclopedia", "查阅"],
+    ["核心理论", "抽象规则", "单独学习不绑定图片的市场周期、订单和心理流程。", "#core-theory", "框架"],
+    ["字幕库", "全视频摘要", "按模块、主题和语言检索全部视频文字资料。", "#video-library", "溯源"],
+    ["资料地图", "原文件索引", "需要 PDF、PPT、书籍和补充课时再进入。", "#materials", "资料"],
+    ["练习工具", "实验室和术语", "用示例图、形态实验室和术语库做复盘。", "#pattern-lab", "训练"]
+  ].map(([title, label, text, href, badge]) => `
+    <a class="home-module-card searchable" href="${href}" data-search="${html(`${title} ${label} ${text} ${badge}`)}">
+      <span>${html(badge)}</span>
+      <strong>${html(title)}</strong>
+      <em>${html(label)}</em>
+      <p>${html(text)}</p>
+    </a>
+  `).join("");
 }
 
 function renderLessonList() {
