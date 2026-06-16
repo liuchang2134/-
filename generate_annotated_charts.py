@@ -82,6 +82,7 @@ def zh_terms(text: str) -> str:
         ("Always In Long", "多头控制"),
         ("Always In Short", "空头控制"),
         ("Always In", "控制权"),
+        ("Brooks", "布鲁克斯"),
         ("Breakout Mode", "突破模式"),
         ("Breakout Pullback", "突破回踩"),
         ("Breakout", "突破"),
@@ -141,8 +142,8 @@ def orange_slide_ratio(image: Image.Image) -> float:
     return float(orange.mean())
 
 
-def clean_source_image(image: Image.Image, pattern: dict) -> Image.Image:
-    """Hide embedded English slide text while preserving the chart structure."""
+def clean_source_image(image: Image.Image, pattern: dict, chart: dict, index: int) -> Image.Image:
+    """Replace embedded English slide text with non-overlapping Chinese panels."""
     image = image.convert("RGB")
 
     if looks_like_viewer_sidebar(image):
@@ -154,40 +155,226 @@ def clean_source_image(image: Image.Image, pattern: dict) -> Image.Image:
         image = image.crop((left, top, right, bottom))
 
     width, height = image.size
-    cleaned = image.convert("RGBA")
-    mask = Image.new("RGBA", cleaned.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(mask)
-    white = (255, 255, 255, 255)
 
     if orange_slide_ratio(image) > 0.35:
-        draw.rectangle((0, 0, width, height), fill=(213, 102, 0, 255))
-        card = (int(width * 0.09), int(height * 0.24), int(width * 0.91), int(height * 0.73))
-        draw.rounded_rectangle(card, radius=18, fill=(255, 255, 255, 255), outline=(255, 255, 255, 255), width=2)
-        card_draw = ImageDraw.Draw(mask)
-        x = card[0] + 28
-        y = card[1] + 30
-        card_draw.text((x, y), f"中文章节封面：{zh_terms(pattern.get('title', '价格行为形态'))}", font=FONT_TITLE, fill=(20, 33, 43))
-        y += 44
-        card_draw.text((x, y), "原英文标题已隐藏，本页作为章节入口保留。", font=FONT_BODY, fill=(82, 100, 121))
-        y += 36
-        card_draw.text((x, y), "请继续查看同一形态下的其它K线样本。", font=FONT_BODY, fill=(82, 100, 121))
-        return Image.alpha_composite(cleaned, mask).convert("RGB")
+        return draw_chinese_chapter_cover(image, pattern)
 
-    # Brooks slides place most English prose in predictable zones: title bar,
-    # upper explanatory text blocks, lower captions, and footer/page metadata.
-    zones = [
-        (0, 0, width, int(height * 0.105)),
-        (int(width * 0.02), int(height * 0.095), int(width * 0.60), int(height * 0.245)),
-        (int(width * 0.62), int(height * 0.095), int(width * 0.98), int(height * 0.305)),
-        (int(width * 0.26), int(height * 0.805), int(width * 0.78), int(height * 0.94)),
-        (0, int(height * 0.94), width, height),
+    return replace_english_with_chinese_panels(image, pattern, chart, index)
+
+
+def as_list(value) -> list[str]:
+    if isinstance(value, list):
+        return [zh_terms(str(item)) for item in value if item]
+    if value:
+        return [zh_terms(str(value))]
+    return []
+
+
+def panel_lines(pattern: dict, kind: str) -> list[str]:
+    best = as_list(pattern.get("best"))
+    entry = as_list(pattern.get("entry"))
+    stop = as_list(pattern.get("stop"))
+    target = as_list(pattern.get("target"))
+    traps = as_list(pattern.get("traps"))
+    summary = zh_terms(pattern.get("summary", "先判断市场背景，再找信号K和入场K。"))
+
+    if kind == "background":
+        return best[:2] or [summary]
+    if kind == "trigger":
+        return entry[:2] or ["等待信号K收盘确认，再考虑入场"]
+    if kind == "plan":
+        return [
+            f"止损：{stop[0] if stop else '放在结构外'}",
+            f"目标：{target[0] if target else '先看1R或下一个磁力位'}",
+        ]
+    if kind == "risk":
+        return traps[:2] or ["背景不成立时放弃，不在区间中间追单"]
+    if kind == "summary":
+        return [summary]
+    return ["用中文替换原图英文说明，按背景、触发、风险、目标阅读"]
+
+
+def draw_chinese_chapter_cover(image: Image.Image, pattern: dict) -> Image.Image:
+    width, height = image.size
+    cleaned = image.convert("RGBA")
+    overlay = Image.new("RGBA", cleaned.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+
+    draw.rectangle((0, 0, width, height), fill=(213, 102, 0, 255))
+    card = (int(width * 0.09), int(height * 0.24), int(width * 0.91), int(height * 0.73))
+    draw.rounded_rectangle(card, radius=18, fill=(255, 255, 255, 255), outline=(255, 255, 255, 255), width=2)
+    x = card[0] + 28
+    y = card[1] + 30
+    draw.text((x, y), f"中文章节封面：{zh_terms(pattern.get('title', '价格行为形态'))}", font=FONT_TITLE, fill=(20, 33, 43))
+    y += 44
+    draw.text((x, y), "原英文标题已替换为中文，本页作为章节入口保留。", font=FONT_BODY, fill=(82, 100, 121))
+    y += 36
+    draw.text((x, y), "请继续查看同一形态下的其它K线样本。", font=FONT_BODY, fill=(82, 100, 121))
+    return Image.alpha_composite(cleaned, overlay).convert("RGB")
+
+
+def box_from_ratio(width: int, height: int, ratio_box: tuple[float, float, float, float]) -> tuple[int, int, int, int]:
+    x1, y1, x2, y2 = ratio_box
+    return (int(width * x1), int(height * y1), int(width * x2), int(height * y2))
+
+
+def zone_has_colored_text(image: Image.Image, box: tuple[int, int, int, int]) -> bool:
+    x1, y1, x2, y2 = box
+    region = np.array(image.crop((x1, y1, x2, y2)).convert("RGB"))
+    if region.size == 0:
+        return False
+    maxc = region.max(axis=2).astype(np.int16)
+    minc = region.min(axis=2).astype(np.int16)
+    brightness = region.mean(axis=2)
+    colored = ((maxc - minc) > 38) & (brightness > 70)
+    dark_letters = (brightness < 125) & ((maxc - minc) > 14)
+    # Keep this sensitive: it is better to add a Chinese replacement panel than
+    # leave a readable English sentence in the chart.
+    return int(colored.sum() + dark_letters.sum() * 0.45) > max(45, region.shape[0] * region.shape[1] * 0.0025)
+
+
+def draw_translation_panel(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    label: str,
+    lines: list[str],
+    accent: tuple[int, int, int],
+) -> None:
+    x1, y1, x2, y2 = box
+    pad = 8
+    # No visible box: the background is cleaned before this step, so only text
+    # is drawn here.
+    draw.text((x1 + pad, y1 + 4), f"{label}：", font=FONT_SMALL, fill=accent)
+
+    max_width = max(80, x2 - x1 - pad * 2)
+    max_height = max(20, y2 - y1 - 28)
+    line_h = 20
+    max_lines = max(1, max_height // line_h)
+    wrapped: list[str] = []
+    for line in lines:
+        wrapped.extend(wrap_text(draw, line, FONT_TINY, max_width))
+    if len(wrapped) > max_lines:
+        wrapped = wrapped[:max_lines]
+        wrapped[-1] = short(wrapped[-1], max(1, len(wrapped[-1]) - 1))
+
+    text_y = y1 + 28
+    for line in wrapped:
+        draw.text((x1 + pad, text_y), line, font=FONT_TINY, fill=(24, 34, 43))
+        text_y += line_h
+
+
+def text_block_size(
+    draw: ImageDraw.ImageDraw,
+    label: str,
+    lines: list[str],
+    max_width: int,
+    max_height: int,
+) -> tuple[int, int]:
+    pad = 8
+    line_h = 20
+    wrapped: list[str] = []
+    for line in lines:
+        wrapped.extend(wrap_text(draw, line, FONT_TINY, max_width - pad * 2))
+    max_lines = max(1, (max_height - 28) // line_h)
+    wrapped = wrapped[:max_lines]
+    widths = [text_width(draw, f"{label}：", FONT_SMALL)]
+    widths.extend(text_width(draw, line, FONT_TINY) for line in wrapped)
+    block_w = min(max_width, max(widths, default=120) + pad * 2)
+    block_h = min(max_height, 28 + line_h * max(1, len(wrapped)))
+    return max(120, block_w), max(48, block_h)
+
+
+def find_clear_text_box(
+    image: Image.Image,
+    search_box: tuple[int, int, int, int],
+    target_w: int,
+    target_h: int,
+    existing: list[tuple[int, int, int, int]],
+) -> tuple[int, int, int, int]:
+    arr = np.array(image.convert("RGB"))
+    height, width = arr.shape[:2]
+    sx1, sy1, sx2, sy2 = search_box
+    sx1, sy1 = max(0, sx1), max(0, sy1)
+    sx2, sy2 = min(width, sx2), min(height, sy2)
+    target_w = min(target_w, max(1, sx2 - sx1))
+    target_h = min(target_h, max(1, sy2 - sy1))
+    if sx1 >= sx2 or sy1 >= sy2:
+        return (sx1, sy1, sx1 + target_w, sy1 + target_h)
+
+    brightness = arr.mean(axis=2)
+    dark = brightness < 115
+    best: tuple[float, tuple[int, int, int, int]] | None = None
+    step = 16
+    max_y = max(sy1 + 1, sy2 - target_h + 1)
+    max_x = max(sx1 + 1, sx2 - target_w + 1)
+    for y in range(sy1, max_y, step):
+        for x in range(sx1, max_x, step):
+            candidate = (x, y, x + target_w, y + target_h)
+            if any(boxes_overlap(candidate, old) for old in existing):
+                continue
+            region = dark[y : y + target_h, x : x + target_w]
+            dark_ratio = float(region.mean()) if region.size else 1.0
+            center_penalty = abs((x + target_w / 2) - (sx1 + sx2) / 2) / max(1, sx2 - sx1)
+            score = dark_ratio * 10 + center_penalty
+            if best is None or score < best[0]:
+                best = (score, candidate)
+
+    if best:
+        return best[1]
+    return (sx1, sy1, sx1 + target_w, sy1 + target_h)
+
+
+def replace_english_with_chinese_panels(image: Image.Image, pattern: dict, chart: dict, index: int) -> Image.Image:
+    width, height = image.size
+    result = scrub_slide_text_zones(image).convert("RGBA")
+    overlay = Image.new("RGBA", result.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    title_h = max(54, int(height * 0.105))
+    footer_top = int(height * 0.955)
+    title = zh_terms(pattern.get("title", "价格行为形态"))
+
+    # Replace the slide title/footer in place.
+    draw.rectangle((0, 0, width, title_h), fill=(213, 102, 0, 255))
+    draw.text((24, 12), f"{title}｜中文替换版｜样本 {index + 1}/5", font=FONT_TITLE, fill=(255, 255, 255))
+    draw.rectangle((0, footer_top, width, height), fill=(213, 102, 0, 255))
+    footer = f"来源：AB 图表百科｜第 {chart.get('page', '')} 页｜英文说明已用中文覆盖"
+    draw.text((20, footer_top + 8), footer, font=FONT_TINY, fill=(255, 248, 235))
+
+    candidate_panels = [
+        ((0.035, 0.112, 0.530, 0.245), "背景", "background", (15, 118, 110)),
+        ((0.580, 0.112, 0.965, 0.300), "触发", "trigger", (37, 99, 168)),
+        ((0.620, 0.305, 0.960, 0.440), "风控", "plan", (169, 111, 23)),
+        ((0.025, 0.665, 0.335, 0.900), "风险", "risk", (201, 79, 54)),
+        ((0.335, 0.785, 0.770, 0.930), "结论", "summary", (15, 118, 110)),
     ]
-    for zone in zones:
-        draw.rectangle(zone, fill=white)
 
-    cleaned = Image.alpha_composite(cleaned, mask).convert("RGB")
-    cleaned = remove_colored_english_annotations(cleaned)
-    return scrub_slide_text_zones(cleaned)
+    drawn_boxes: list[tuple[int, int, int, int]] = []
+    for ratio_box, label, kind, accent in candidate_panels:
+        search_box = box_from_ratio(width, height, ratio_box)
+        if not zone_has_colored_text(image, search_box):
+            continue
+        lines = panel_lines(pattern, kind)
+        search_w = search_box[2] - search_box[0]
+        search_h = search_box[3] - search_box[1]
+        text_w, text_h = text_block_size(draw, label, lines, min(search_w, 420), search_h)
+        box = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, drawn_boxes)
+        draw_translation_panel(draw, box, label, lines, accent)
+        drawn_boxes.append(box)
+
+    if not drawn_boxes:
+        search_box = box_from_ratio(width, height, (0.035, 0.115, 0.530, 0.255))
+        lines = panel_lines(pattern, "background")
+        text_w, text_h = text_block_size(draw, "背景", lines, min(search_box[2] - search_box[0], 420), search_box[3] - search_box[1])
+        fallback = find_clear_text_box(result.convert("RGB"), search_box, text_w, text_h, [])
+        draw_translation_panel(draw, fallback, "背景", lines, (15, 118, 110))
+
+    return Image.alpha_composite(result, overlay).convert("RGB")
+
+
+def boxes_overlap(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 
 
 def remove_colored_english_annotations(image: Image.Image) -> Image.Image:
@@ -208,11 +395,7 @@ def scrub_slide_text_zones(image: Image.Image) -> Image.Image:
 
     zones = [
         (0, 0, width, int(height * 0.12)),
-        (int(width * 0.02), int(height * 0.10), int(width * 0.62), int(height * 0.38)),
-        (int(width * 0.56), int(height * 0.10), int(width * 0.99), int(height * 0.40)),
-        (int(width * 0.00), int(height * 0.36), int(width * 0.68), int(height * 0.64)),
-        (int(width * 0.02), int(height * 0.54), int(width * 0.80), int(height * 0.83)),
-        (int(width * 0.18), int(height * 0.65), int(width * 0.86), int(height * 0.92)),
+        (0, int(height * 0.12), width, int(height * 0.94)),
         (0, int(height * 0.88), width, height),
     ]
 
@@ -320,7 +503,7 @@ def annotate(pattern: dict, chart: dict, index: int) -> None:
     out_src.parent.mkdir(parents=True, exist_ok=True)
 
     with Image.open(raw_src) as image:
-        image = clean_source_image(image, pattern)
+        image = clean_source_image(image, pattern, chart, index)
         width, height = image.size
         header_h = 78
         footer_h = 118
@@ -339,19 +522,7 @@ def annotate(pattern: dict, chart: dict, index: int) -> None:
     source = f"来源：图表百科 · 第 {chart.get('page', '')} 页"
     draw.text((22, 50), source, font=FONT_TINY, fill=(201, 218, 224))
 
-    best = short(zh_terms(first(pattern.get("best"), "先确认市场背景。")), 42)
-    entry = short(zh_terms(first(pattern.get("entry"), "等待触发，不提前进场。")), 42)
-    stop = short(zh_terms(first(pattern.get("stop"), "止损放在结构外。")), 34)
-    target = short(zh_terms(first(pattern.get("target"), "先看 1R 或下一个磁力位。")), 34)
     trap = short(zh_terms(first(pattern.get("traps"), "背景不成立时放弃。")), 52)
-
-    chart_top = header_h + 16
-    chart_bottom = header_h + height - 16
-    box_w = min(390, max(290, width // 3))
-    draw_box(draw, (16, chart_top), box_w, "背景", best, accent)
-    draw_box(draw, (width - box_w - 16, chart_top), box_w, "触发", entry, (37, 99, 168))
-    draw_box(draw, (16, max(chart_top + 90, chart_bottom - 92)), box_w, "止损", stop, (201, 79, 54))
-    draw_box(draw, (width - box_w - 16, max(chart_top + 90, chart_bottom - 92)), box_w, "目标", target, (169, 111, 23))
 
     footer_y = header_h + height
     draw.rectangle((0, footer_y, width, footer_y + footer_h), fill=(255, 255, 255))
@@ -362,7 +533,7 @@ def annotate(pattern: dict, chart: dict, index: int) -> None:
     for line in trap_lines[:2]:
         draw.text((22, y), line, font=FONT_SMALL, fill=(82, 100, 121))
         y += 24
-    draw.text((max(22, width - 295), footer_y + footer_h - 28), "原图英文说明已遮盖，保留价格结构", font=FONT_TINY, fill=(101, 115, 129))
+    draw.text((max(22, width - 345), footer_y + footer_h - 28), "原图英文说明已用中文覆盖，避免重叠", font=FONT_TINY, fill=(101, 115, 129))
 
     annotated = Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
     annotated.save(out_src, quality=88, optimize=True)
