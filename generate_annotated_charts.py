@@ -136,13 +136,17 @@ def looks_like_viewer_sidebar(image: Image.Image) -> bool:
     return left_bright > 205 and center_bright < 205
 
 
-def orange_slide_ratio(image: Image.Image) -> float:
+def is_chapter_cover_image(image: Image.Image) -> bool:
     arr = np.array(image.convert("RGB"))
-    orange = (arr[:, :, 0] > 165) & (arr[:, :, 1] >= 55) & (arr[:, :, 1] <= 140) & (arr[:, :, 2] < 45)
-    return float(orange.mean())
+    brightness = arr.mean(axis=2)
+    maxc = arr.max(axis=2)
+    minc = arr.min(axis=2)
+    orange = (arr[:, :, 0] > 150) & (arr[:, :, 1] >= 50) & (arr[:, :, 1] <= 155) & (arr[:, :, 2] < 85) & ((arr[:, :, 0] - arr[:, :, 1]) > 45)
+    dark = (brightness < 90) & ((maxc - minc) < 70)
+    return float(orange.mean()) > 0.42 and float(dark.mean()) < 0.004
 
 
-def clean_source_image(image: Image.Image, pattern: dict, chart: dict, index: int) -> Image.Image:
+def clean_source_image(image: Image.Image, pattern: dict, chart: dict, index: int) -> Image.Image | None:
     """Replace embedded English slide text with non-overlapping Chinese panels."""
     image = image.convert("RGB")
 
@@ -156,8 +160,8 @@ def clean_source_image(image: Image.Image, pattern: dict, chart: dict, index: in
 
     width, height = image.size
 
-    if orange_slide_ratio(image) > 0.35:
-        return draw_chinese_chapter_cover(image, pattern)
+    if is_chapter_cover_image(image):
+        return None
 
     return replace_english_with_chinese_panels(image, pattern, chart, index)
 
@@ -192,25 +196,6 @@ def panel_lines(pattern: dict, kind: str) -> list[str]:
     if kind == "summary":
         return [summary]
     return ["用中文替换原图英文说明，按背景、触发、风险、目标阅读"]
-
-
-def draw_chinese_chapter_cover(image: Image.Image, pattern: dict) -> Image.Image:
-    width, height = image.size
-    cleaned = image.convert("RGBA")
-    overlay = Image.new("RGBA", cleaned.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-
-    draw.rectangle((0, 0, width, height), fill=(213, 102, 0, 255))
-    card = (int(width * 0.09), int(height * 0.24), int(width * 0.91), int(height * 0.73))
-    draw.rounded_rectangle(card, radius=18, fill=(255, 255, 255, 255), outline=(255, 255, 255, 255), width=2)
-    x = card[0] + 28
-    y = card[1] + 30
-    draw.text((x, y), f"中文章节封面：{zh_terms(pattern.get('title', '价格行为形态'))}", font=FONT_TITLE, fill=(20, 33, 43))
-    y += 44
-    draw.text((x, y), "原英文标题已替换为中文，本页作为章节入口保留。", font=FONT_BODY, fill=(82, 100, 121))
-    y += 36
-    draw.text((x, y), "请继续查看同一形态下的其它K线样本。", font=FONT_BODY, fill=(82, 100, 121))
-    return Image.alpha_composite(cleaned, overlay).convert("RGB")
 
 
 def box_from_ratio(width: int, height: int, ratio_box: tuple[float, float, float, float]) -> tuple[int, int, int, int]:
@@ -488,13 +473,17 @@ def boxes_overlap(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) ->
     return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 
 
-def annotate(pattern: dict, chart: dict, index: int) -> None:
+def annotate(pattern: dict, chart: dict, index: int) -> bool:
     raw_src = ROOT / chart["src"]
     out_src = ROOT / chart["src"].replace("assets/ab-charts/", "assets/ab-charts-annotated/").replace(".jpg", "-annotated.jpg")
     out_src.parent.mkdir(parents=True, exist_ok=True)
 
     with Image.open(raw_src) as image:
         image = clean_source_image(image, pattern, chart, index)
+        if image is None:
+            if out_src.exists():
+                out_src.unlink()
+            return False
         width, height = image.size
         header_h = 78
         footer_h = 118
@@ -528,6 +517,7 @@ def annotate(pattern: dict, chart: dict, index: int) -> None:
 
     annotated = Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
     annotated.save(out_src, quality=88, optimize=True)
+    return True
 
 
 def main() -> None:
@@ -536,6 +526,7 @@ def main() -> None:
     pattern_by_id = {pattern["id"]: pattern for pattern in patterns}
 
     total = 0
+    skipped_covers = 0
     missing = []
     for pattern_id, chart_items in charts.items():
         pattern = pattern_by_id.get(pattern_id)
@@ -543,9 +534,11 @@ def main() -> None:
             missing.append(pattern_id)
             continue
         for index, chart in enumerate(chart_items):
-            annotate(pattern, chart, index)
-            total += 1
-    print(json.dumps({"annotated": total, "patterns": len(patterns), "missingPatterns": missing}, ensure_ascii=False, indent=2))
+            if annotate(pattern, chart, index):
+                total += 1
+            else:
+                skipped_covers += 1
+    print(json.dumps({"annotated": total, "skippedCovers": skipped_covers, "patterns": len(patterns), "missingPatterns": missing}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

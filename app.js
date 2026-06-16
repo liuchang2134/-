@@ -436,6 +436,282 @@ const siteData = window.SITE_DATA || {
 const encyclopediaPatterns = window.PATTERN_ENCYCLOPEDIA || [];
 const abChartImages = window.AB_CHART_IMAGES || {};
 
+const chartCoverImageSources = new Set([
+  "assets/ab-charts/broad-bear-channel-03.jpg",
+  "assets/ab-charts/broad-bull-channel-01.jpg",
+  "assets/ab-charts/broad-bull-channel-02.jpg",
+  "assets/ab-charts/buy-low-sell-high-range-02.jpg",
+  "assets/ab-charts/climactic-reversal-04.jpg",
+  "assets/ab-charts/climax-then-trading-range-01.jpg",
+  "assets/ab-charts/double-bottom-02.jpg",
+  "assets/ab-charts/double-bottom-bull-flag-04.jpg",
+  "assets/ab-charts/double-bottom-bull-flag-05.jpg",
+  "assets/ab-charts/double-top-01.jpg",
+  "assets/ab-charts/double-top-bear-flag-04.jpg",
+  "assets/ab-charts/double-top-bear-flag-05.jpg",
+  "assets/ab-charts/ema-gap-bar-03.jpg",
+  "assets/ab-charts/expanding-triangle-01.jpg",
+  "assets/ab-charts/failed-final-flag-breakout-03.jpg",
+  "assets/ab-charts/failed-final-flag-breakout-05.jpg",
+  "assets/ab-charts/failed-second-entry-05.jpg",
+  "assets/ab-charts/failed-signal-bar-01.jpg",
+  "assets/ab-charts/high-1-low-1-01.jpg",
+  "assets/ab-charts/high-2-bull-flag-01.jpg",
+  "assets/ab-charts/high-3-low-3-03.jpg",
+  "assets/ab-charts/inside-bar-breakout-02.jpg",
+  "assets/ab-charts/lower-low-mtr-02.jpg",
+  "assets/ab-charts/major-trend-reversal-bottom-03.jpg",
+  "assets/ab-charts/measuring-gap-04.jpg",
+  "assets/ab-charts/micro-channel-01.jpg",
+  "assets/ab-charts/micro-double-top-bear-flag-02.jpg",
+  "assets/ab-charts/nested-wedge-01.jpg",
+  "assets/ab-charts/nested-wedge-02.jpg",
+  "assets/ab-charts/outside-bar-signal-04.jpg",
+  "assets/ab-charts/scale-in-trading-range-05.jpg",
+  "assets/ab-charts/scalp-in-trading-range-02.jpg",
+  "assets/ab-charts/strong-breakout-follow-through-05.jpg",
+  "assets/ab-charts/swing-after-strong-breakout-03.jpg",
+  "assets/ab-charts/trend-from-the-open-03.jpg",
+  "assets/ab-charts/trend-from-the-open-04.jpg",
+  "assets/ab-charts/two-legged-pullback-to-ema-04.jpg",
+  "assets/ab-charts/wedge-bull-flag-01.jpg",
+  "assets/ab-charts/wedge-bull-flag-02.jpg"
+]);
+
+const coreTheoryDefinitions = [
+  {
+    id: "market-cycle",
+    title: "市场周期与惯性",
+    scope: "先判断环境，再谈形态",
+    priority: 100,
+    topics: ["市场周期", "趋势与Always In"],
+    keywords: ["cycle", "inertia", "trend", "channel", "trading range", "always in", "市场周期", "惯性"],
+    thesis: "Brooks 反复强调，价格通常在突破、通道和交易区间之间循环。强趋势里多数反转失败，交易区间里多数突破失败；你先要知道自己站在哪个环境里。",
+    rules: [
+      "强突破代表市场在重新定价，顺突破方向的交易优先级更高。",
+      "通道是弱趋势：仍有方向，但回调开始变深、重叠开始增加。",
+      "交易区间是双向市场，边缘交易优于中间交易，追突破要更谨慎。",
+      "惯性不是预测，而是默认假设：当前状态会继续，直到反证出现。"
+    ],
+    mistakes: [
+      "看见一根反转 K 就认为趋势结束。",
+      "在交易区间中间硬做方向判断。",
+      "把通道当作没有方向的矩形区间。"
+    ],
+    transfer: "任何形态条目都先套这句：它发生在强趋势、弱通道、还是交易区间？背景错了，形态名字再标准也不能提高胜率。"
+  },
+  {
+    id: "always-in",
+    title: "Always In 与方向控制权",
+    scope: "判断市场必须持仓时偏多还是偏空",
+    priority: 98,
+    topics: ["趋势与Always In", "市场周期"],
+    keywords: ["always in", "ail", "ais", "control", "trend reversal", "方向", "控制权"],
+    thesis: "Always In 不是叫你任何时候都持仓，而是训练你判断：如果必须在市场里，只能选多还是空？它把混乱图表压缩成控制权问题。",
+    rules: [
+      "连续强收盘、浅回调和失败反转，通常说明 Always In 仍在原方向。",
+      "真正的方向切换需要反向突破、跟随和原方向测试失败。",
+      "强趋势第一波反转多数只是获利了结，不是趋势反转。",
+      "当 Always In 不清楚，仓位和目标都要降级。"
+    ],
+    mistakes: [
+      "把 Always In 当成追单信号。",
+      "方向刚模糊就急着预测反转。",
+      "忽略反向跟随质量，只看是否突破某条线。"
+    ],
+    transfer: "High 2、Low 2、MTR、楔形都要先问 Always In 有没有改变；没有改变时，逆势形态只能按小概率或短线处理。"
+  },
+  {
+    id: "trader-equation",
+    title: "交易者方程：概率、风险、回报",
+    scope: "胜率不能脱离止损和目标",
+    priority: 96,
+    topics: ["交易管理", "订单与止损", "市场周期"],
+    keywords: ["probability", "risk", "reward", "actual risk", "trader's equation", "probability risk reward", "交易者方程"],
+    thesis: "Brooks 的胜率口径不是独立数字。任何交易都要同时看概率、实际风险、目标空间和管理方式；方向看对但止损太远，也可能不是好交易。",
+    rules: [
+      "高概率通常伴随更差价格或更远止损，不能只看命中率。",
+      "实际风险是入场后市场真正给你的风险，常常小于理论止损，也可能突然扩大。",
+      "目标太近时，低胜率反转没有交易价值；目标足够远时，40% 也可能能做。",
+      "交易前先知道退出条件，而不是进场后再找理由。"
+    ],
+    mistakes: [
+      "把 60% 胜率理解成每次都该做。",
+      "只背形态胜率，不计算止损距离。",
+      "盈利后没有按背景决定是波段持有还是快速兑现。"
+    ],
+    transfer: "形态百科里的胜率排名只是入口；真正筛选时，把该形态的止损、目标和失效条件一起读。"
+  },
+  {
+    id: "orders-stops",
+    title: "订单、入场、止损与实际风险",
+    scope: "把观点变成可执行交易",
+    priority: 94,
+    topics: ["订单与止损", "K线与信号", "交易管理"],
+    keywords: ["entry", "stop", "protective stop", "signal bar", "entry bar", "actual risk", "limit order", "stop order"],
+    thesis: "Brooks 会把入场讲得非常具体：信号 K、入场 K、止损位置、实际风险、是否允许回撤。因为价格行为不是观点比赛，而是订单执行问题。",
+    rules: [
+      "信号 K 只提供触发条件，入场后是否有跟随才决定质量。",
+      "止损通常放在结构外，而不是放在心理舒服的位置。",
+      "大信号 K 可能方向清楚但风险太大，需要等回调或缩小仓位。",
+      "限价单适合区间思路，止损单更常用于突破和顺势触发。"
+    ],
+    mistakes: [
+      "信号 K 漂亮就入场，却没有计划止损。",
+      "入场 K 立刻反向还继续找理由。",
+      "把止损放得太近，结果被正常噪音扫出。"
+    ],
+    transfer: "每个形态模块都可以按同一流程落地：触发在哪里，结构止损在哪里，触发后第一根入场 K 是否支持你的方向。"
+  },
+  {
+    id: "signal-context",
+    title: "信号 K 必须服从背景",
+    scope: "单根 K 线不能独立下结论",
+    priority: 92,
+    topics: ["K线与信号", "市场周期", "突破"],
+    keywords: ["signal bar", "entry bar", "tail", "close", "bar", "context", "信号K"],
+    thesis: "课程里大量信号 K 的讨论其实都在讲同一件事：K 线质量要和位置、背景、左侧压力、目标空间一起判断。漂亮信号出现在错误位置，仍然是差交易。",
+    rules: [
+      "强信号通常收在极端，并且出现在关键位置。",
+      "尾巴多、实体小、重叠多，通常说明双方都不愿意承诺。",
+      "在区间边缘，一般信号也可能足够；在区间中间，漂亮信号也要降级。",
+      "信号后没有跟随，就是市场没有确认你的判断。"
+    ],
+    mistakes: [
+      "只看蜡烛形状，不看它左边发生了什么。",
+      "把每根外包 K、内包 K 都当成交易信号。",
+      "忽略信号 K 太大导致风险收益变差。"
+    ],
+    transfer: "百科图里的中文标注会提示背景、触发、止损和目标；读图时不要只盯买卖框，要回看信号出现的位置。"
+  },
+  {
+    id: "trading-range",
+    title: "交易区间的买低卖高原则",
+    scope: "区间里多数突破会失败",
+    priority: 90,
+    topics: ["交易区间", "突破", "交易管理"],
+    keywords: ["trading range", "range", "failed breakout", "buy low sell high", "ttr", "区间"],
+    thesis: "Brooks 对交易区间的核心提醒很朴素：多空都能赚钱，追突破的人经常被困。区间中间信息最差，边缘和失败突破才是重点。",
+    rules: [
+      "区间高位优先寻找做空或获利了结，低位优先寻找做多或空头回补。",
+      "突破没有连续跟随，往往会回到区间。",
+      "窄区间里不要反复追高杀低，等待更清楚的边缘或突破跟随。",
+      "区间里的目标要务实，先看中线，再看另一侧。"
+    ],
+    mistakes: [
+      "把区间里的大阳线当成趋势开始。",
+      "在中间位置做满仓方向单。",
+      "突破失败后还坚持原突破方向。"
+    ],
+    transfer: "失败突破、双顶双底、第二次入场等形态，在交易区间语境下比在强趋势中更有意义。"
+  },
+  {
+    id: "breakout-follow-through",
+    title: "突破必须看跟随",
+    scope: "突破不是穿过去，而是站得住",
+    priority: 88,
+    topics: ["突破", "趋势与Always In", "K线与信号"],
+    keywords: ["breakout", "follow-through", "gap", "breakout pullback", "failed breakout", "突破", "跟随"],
+    thesis: "Brooks 讲突破时，重点不是某一根 K 突破了线，而是突破后有没有更多交易者愿意在突破方向继续成交。跟随决定突破是真的还是陷阱。",
+    rules: [
+      "强突破常见大实体、收盘靠近极端、后续回调浅。",
+      "突破后 1-3 根 K 如果马上回到原区间，要按失败突破处理。",
+      "突破回踩成功，通常比第一根突破更容易管理风险。",
+      "高潮式突破可能短期成功，但追在末端要降低目标。"
+    ],
+    mistakes: [
+      "只要穿过线就追，忽略收盘和后续 K。",
+      "突破已经过远，还用原始止损硬追。",
+      "失败突破回到区间后不愿意反向思考。"
+    ],
+    transfer: "强突破、突破回踩、测量缺口、开盘趋势日都围绕同一个问题：突破后是否持续被接受。"
+  },
+  {
+    id: "support-magnets",
+    title: "支撑阻力、磁力位和测量移动",
+    scope: "位置决定交易是否值得做",
+    priority: 86,
+    topics: ["支撑阻力/磁力", "测量移动", "开盘与日内"],
+    keywords: ["support", "resistance", "magnet", "measured move", "target", "open", "yesterday", "磁力", "测量移动"],
+    thesis: "支撑阻力和磁力位告诉你市场会在哪里关注价格，不直接告诉你买卖方向。测量移动是目标框架，不是入场理由。",
+    rules: [
+      "前高低、开盘价、昨日高低、均线、趋势线和测量目标都会吸引价格。",
+      "到达磁力位后，先观察突破、失败还是横盘。",
+      "测量移动适合规划目标和止盈，不应单独触发交易。",
+      "关键位置越明显，越容易引发获利了结和反向尝试。"
+    ],
+    mistakes: [
+      "画太多线，导致任何位置都像关键位。",
+      "价格一到支撑阻力就立刻反向。",
+      "目标位太近还追单，风险收益不够。"
+    ],
+    transfer: "读任何 AB 原图时先找位置：它是在磁力位附近触发，还是在没有空间的中间地带触发。"
+  },
+  {
+    id: "reversal-process",
+    title: "反转是过程，不是猜顶底",
+    scope: "MTR、楔形、高潮都要等证据",
+    priority: 84,
+    topics: ["反转/MTR", "楔形/三推", "末端旗形/高潮"],
+    keywords: ["major trend reversal", "mtr", "wedge", "climax", "final flag", "second entry", "反转"],
+    thesis: "Brooks 讲反转时最防新手冲动：真正反转通常需要原趋势过度、趋势线被破、测试失败、二次信号或强反向跟随。第一根反向 K 很少足够。",
+    rules: [
+      "强趋势中第一次反转常是小回调，不能直接当 MTR。",
+      "MTR 更像三步过程：破趋势线，测试极端失败，再出现二次信号。",
+      "楔形和高潮强调动能衰竭，但仍需要触发和跟随。",
+      "反转交易概率低于顺势，但目标足够时可以成立。"
+    ],
+    mistakes: [
+      "因为涨多了就做空，跌多了就做多。",
+      "看到三推就忽略趋势强度。",
+      "没有二次信号也强行预测趋势结束。"
+    ],
+    transfer: "MTR、楔形、末端旗形、高潮反转都不要孤立记，统一按“原趋势证据减弱 + 反向证据增强”来读。"
+  },
+  {
+    id: "open-day-structure",
+    title: "开盘与日内结构",
+    scope: "一天的早期信息决定交易节奏",
+    priority: 78,
+    topics: ["开盘与日内", "市场周期", "突破"],
+    keywords: ["open", "opening reversal", "gap", "trend from the open", "day", "开盘"],
+    thesis: "开盘课里有大量不绑定单张图的规则：开盘会测试昨日高低、缺口、开盘价和均线；早期强突破可能定义全天，早期失败则容易进入区间。",
+    rules: [
+      "开盘前几根 K 的强弱、尾巴和重叠，决定当天先按趋势日还是区间日处理。",
+      "强开盘突破有跟随时，不要太早逆势猜回补缺口。",
+      "开盘测试关键位失败，可能形成当天第一段主波段。",
+      "午后交易要考虑当天已经形成的高低点和磁力位。"
+    ],
+    mistakes: [
+      "开盘波动大就立刻反向。",
+      "忽略昨日高低点、缺口和开盘价。",
+      "趋势日里用区间目标太早出场，区间日里用趋势目标硬扛。"
+    ],
+    transfer: "开盘反转、趋势开盘、缺口测试和当天测量移动，都先按日内结构看，而不是只按单个形态名看。"
+  },
+  {
+    id: "process-psychology",
+    title: "交易流程与心理纪律",
+    scope: "减少冲动和二次错误",
+    priority: 74,
+    topics: ["交易系统/心理", "交易管理", "术语基础"],
+    keywords: ["discipline", "psychology", "plan", "management", "system", "心理", "流程"],
+    thesis: "Brooks 的课程不是只教形态，也一直在训练流程：等待、放弃、缩小仓位、接受小亏、避免在低质量位置重复交易。心理纪律来自清楚的规则。",
+    rules: [
+      "交易前写清楚背景、入场、止损、目标和失效，不在入场后补理由。",
+      "连续亏损通常说明环境判断错了，先暂停而不是加速追回。",
+      "不清楚时降低频率；错过交易比在坏位置进场更容易修复。",
+      "复盘要统计同一类错误，而不是只看单笔盈亏。"
+    ],
+    mistakes: [
+      "错过一笔后追在最差位置。",
+      "亏损后把短线交易改成波段幻想。",
+      "每天换一种形态重点，无法积累样本。"
+    ],
+    transfer: "这个模块是所有形态的底层执行层：当百科条目给出条件时，你只做满足条件的样本，不用每张图都交易。"
+  }
+];
+
 const exampleAtlas = [
   {
     id: "breakout-follow-through",
@@ -631,6 +907,7 @@ function init() {
   renderLesson();
   renderEncyclopediaFilters();
   renderEncyclopedia();
+  renderCoreTheory();
   renderVideoFilters();
   renderVideoLibrary();
   renderMaterials();
@@ -861,6 +1138,113 @@ function renderEncyclopediaDetail() {
       <section class="empty-state">这个形态暂时没有匹配到 AB 原图截图。</section>
     `}
   `;
+}
+
+function renderCoreTheory() {
+  const lessons = siteData.videoLessons || [];
+  const stats = siteData.stats || {};
+  const modules = coreTheoryDefinitions.map((module) => ({
+    ...module,
+    sourceScore: module.topics.reduce((sum, topic) => sum + topicLibraryScore(topic), 0),
+    lessons: coreTheoryLessons(module)
+  }));
+
+  const coveredTopics = uniqueOrdered(coreTheoryDefinitions.flatMap((module) => module.topics));
+  $("#coreTheoryStats").innerHTML = [
+    ["理论模块", `${coreTheoryDefinitions.length} 个`, "独立于单张图的 Brooks 方法论"],
+    ["字幕来源", `${formatNumber(stats.subtitleFiles || lessons.length)} 份`, `覆盖 ${formatNumber(stats.uniqueCourseUnits || lessons.length)} 个课程单元`],
+    ["核心主题", `${coveredTopics.length} 类`, coveredTopics.slice(0, 4).join(" / ")],
+    ["课程权重", formatNumber(modules.reduce((sum, module) => sum + module.sourceScore, 0)), "按字幕主题得分汇总"]
+  ].map(([label, value, note]) => `
+    <div class="mini-stat searchable" data-search="${html(`${label} ${value} ${note}`)}">
+      <span>${html(label)}</span><strong>${html(value)}</strong><small>${html(note)}</small>
+    </div>
+  `).join("");
+
+  $("#coreTheoryGrid").innerHTML = modules
+    .sort((a, b) => b.priority - a.priority)
+    .map((module, index) => renderCoreTheoryCard(module, index))
+    .join("");
+}
+
+function renderCoreTheoryCard(module, index) {
+  const lessonSearch = module.lessons.map((lesson) => searchText(lesson)).join(" ");
+  const keywords = uniqueOrdered([...(module.topics || []), ...(module.keywords || [])]).slice(0, 8);
+  return `
+    <article class="core-theory-card searchable" data-search="${html(`${searchText(module)} ${lessonSearch}`)}">
+      <div class="core-theory-top">
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <strong>重要性 ${module.priority}</strong>
+      </div>
+      <div class="core-theory-head">
+        <div>
+          <p class="eyebrow">${html(module.scope)}</p>
+          <h3>${html(module.title)}</h3>
+        </div>
+        <div class="term-chips">${keywords.map((item) => `<span>${html(item)}</span>`).join("")}</div>
+      </div>
+      <p class="core-thesis">${html(module.thesis)}</p>
+      <div class="theory-columns">
+        <section>
+          <h4>课程提炼</h4>
+          <ul>${module.rules.map((item) => `<li>${html(item)}</li>`).join("")}</ul>
+        </section>
+        <section>
+          <h4>常见误读</h4>
+          <ul>${module.mistakes.map((item) => `<li>${html(item)}</li>`).join("")}</ul>
+        </section>
+      </div>
+      <div class="theory-transfer">
+        <span>套到形态百科时怎么用</span>
+        <p>${html(module.transfer)}</p>
+      </div>
+      ${module.lessons.length ? `
+        <div class="theory-source-list">
+          <div class="related-heading">
+            <h5>对应视频课摘要</h5>
+            <span>${html(module.topics.join(" / "))}</span>
+          </div>
+          ${module.lessons.slice(0, 5).map((lesson) => `
+            <article class="theory-source-row">
+              <span>${html(lesson.module)} · ${html(lesson.language)} · ${formatDuration(lesson.minutesEstimate || 0)}</span>
+              <strong>${html(lesson.title)}</strong>
+              <p>${html(lesson.summary)}</p>
+            </article>
+          `).join("")}
+        </div>
+      ` : ""}
+    </article>
+  `;
+}
+
+function coreTheoryLessons(module) {
+  return (siteData.videoLessons || [])
+    .map((lesson) => ({ lesson, score: coreTheoryLessonScore(lesson, module) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || (b.lesson.wordUnits || 0) - (a.lesson.wordUnits || 0))
+    .slice(0, 6)
+    .map((item) => item.lesson);
+}
+
+function coreTheoryLessonScore(lesson, module) {
+  const lessonTopics = lesson.topics || [];
+  const text = searchText(lesson).toLowerCase();
+  let score = 0;
+  (module.topics || []).forEach((topic) => {
+    if (lessonTopics.includes(topic)) score += 45;
+    if (text.includes(topic.toLowerCase())) score += 10;
+  });
+  (module.keywords || []).forEach((keyword) => {
+    if (text.includes(String(keyword).toLowerCase())) score += 8;
+  });
+  if (lesson.language === "中文") score += 3;
+  if (String(lesson.module || "").includes("核心")) score += 2;
+  return score;
+}
+
+function topicLibraryScore(topic) {
+  const item = (siteData.stats?.topTopics || []).find((row) => row.topic === topic);
+  return item?.score || 0;
 }
 
 function patternVideoInsight(pattern) {
@@ -1428,9 +1812,12 @@ function localHref(path) {
 }
 
 function normalizeChartItems(value) {
-  if (Array.isArray(value)) return value;
-  if (value) return [value];
-  return [];
+  const items = Array.isArray(value) ? value : value ? [value] : [];
+  return items.filter((chart) => !isChapterCoverChart(chart));
+}
+
+function isChapterCoverChart(chart) {
+  return chartCoverImageSources.has(String(chart?.src || ""));
 }
 
 function colorForFamily(family) {
