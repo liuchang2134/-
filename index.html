@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <title>价格行为学一站式课程</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#overview">
+        <span class="brand-mark">PA</span>
+        <span>
+          <strong>Price Action Academy</strong>
+          <small>Al Brooks 价格行为学院</small>
+        </span>
+      </a>
+      <div class="top-actions">
+        <nav class="quick-nav" aria-label="站内导航">
+          <a href="#overview">学习首页</a>
+          <a href="#course">课程路径</a>
+          <a href="#encyclopedia">百科/原图</a>
+          <a href="#video-library">字幕资料</a>
+          <a href="#materials">资料地图</a>
+          <a href="#drills">训练</a>
+        </nav>
+        <label class="search-box">
+          <span>全站搜索</span>
+          <input id="courseSearch" type="search" placeholder="趋势、突破、MTR、止损、交易区间..." />
+        </label>
+        <button id="resetProgress" class="ghost-button" type="button">清空进度</button>
+      </div>
+    </header>
+
+    <section id="overview" class="wide-section overview-section learning-home">
+      <div class="learning-hero">
+        <div class="learning-copy">
+          <p class="eyebrow">One Stop Learning Site</p>
+          <h1>Al Brooks 价格行为学习站</h1>
+          <p>把文件夹里的视频字幕、课程路线、形态百科、PPT/书籍索引和 AB 原图样本整理成一套可查、可学、可训练的网站。</p>
+          <div class="hero-actions">
+            <button id="continueLearning" class="primary-button" type="button">继续学习</button>
+            <button id="jumpEncyclopedia" class="secondary-button" type="button">查形态百科</button>
+            <button id="jumpGallery" class="ghost-button" type="button">看 AB 原图</button>
+          </div>
+        </div>
+        <aside class="continue-card" aria-label="学习进度">
+          <div class="continue-topline">
+            <span>当前进度</span>
+            <strong id="homeProgressText">0/15</strong>
+          </div>
+          <div class="progress-track"><div id="homeProgressFill"></div></div>
+          <p id="homeNextLesson">下一课：建立价格行为语言</p>
+          <div class="continue-links">
+            <a href="#course">课程讲义</a>
+            <a href="#video-library">字幕摘要</a>
+            <a href="#drills">训练清单</a>
+          </div>
+        </aside>
+      </div>
+
+      <div class="section-heading home-heading">
+        <div>
+          <p class="eyebrow">Study Console</p>
+          <h2>学习控制台</h2>
+        </div>
+        <p>推荐顺序：先按课程路径建立语言，再用百科查形态胜率和条件，最后用 AB 原图与训练清单做样本统计。</p>
+      </div>
+      <div id="statGrid" class="stat-grid academy-stat-grid"></div>
+      <div class="learning-path-grid">
+        <article>
+          <span>01</span>
+          <strong>主线课程</strong>
+          <p>按学习路径读每课总结、图解和小测，先形成 Brooks 的市场语言。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <strong>形态百科</strong>
+          <p>按胜率口径和重要性排序，查询背景、入场、止损、目标和陷阱。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <strong>AB 原图样本</strong>
+          <p>每个形态配 5 张 Brooks 原图截图，先看真实图，再做自己的标注。</p>
+        </article>
+        <article>
+          <span>04</span>
+          <strong>训练系统</strong>
+          <p>把学到的 setup 写进开平细节表，做 100 笔、400 笔、500 笔复盘。</p>
+        </article>
+      </div>
+      <div class="overview-layout learning-overview-layout">
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>主题索引</h2>
+            <span>来自全部字幕关键词</span>
+          </div>
+          <div id="topicBars" class="topic-bars"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>使用方式</h2>
+            <span>一站式学习流程</span>
+          </div>
+          <div class="route-list">
+            <div><strong>先学一课</strong><span>用课程区读讲义、看图解、做小测，不需要回到原视频文件。</span></div>
+            <div><strong>再查形态</strong><span>遇到 MTR、High 2、失败突破等概念时，直接进百科查条件。</span></div>
+            <div><strong>对照原图</strong><span>每个百科条目都嵌入 AB 原图截图，用真实样本修正理解。</span></div>
+            <div><strong>最后训练</strong><span>只选一两个 setup 做大量样本，记录入场、止损、目标和结果。</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <main id="course" class="course-shell">
+      <aside class="lesson-nav" aria-label="课程章节">
+        <div class="nav-title">
+          <strong>课程目录</strong>
+          <span id="lessonCount"></span>
+        </div>
+        <div id="lessonList" class="lesson-list"></div>
+      </aside>
+
+      <section class="reader">
+        <div class="reader-toolbar">
+          <button id="prevLesson" class="icon-button" type="button" aria-label="上一课">‹</button>
+          <div>
+            <p class="eyebrow">Lesson</p>
+            <h1 id="lessonTitle"></h1>
+          </div>
+          <button id="nextLesson" class="icon-button" type="button" aria-label="下一课">›</button>
+        </div>
+
+        <article id="lessonContent" class="lesson-content"></article>
+
+        <div class="lesson-actions">
+          <button id="completeLesson" class="primary-button" type="button">标记本课完成</button>
+          <button id="openPatternLab" class="secondary-button" type="button">打开形态实验室</button>
+        </div>
+      </section>
+
+      <aside class="right-rail">
+        <section class="panel progress-panel">
+          <div class="panel-heading">
+            <h2>学习进度</h2>
+            <span id="progressText"></span>
+          </div>
+          <div class="progress-track"><div id="progressFill"></div></div>
+          <p>目标不是刷完，而是每学一课都能写进自己的开平细节表。</p>
+        </section>
+
+        <section class="panel quiz-panel">
+          <div class="panel-heading">
+            <h2>本课小测</h2>
+            <span id="quizStatus"></span>
+          </div>
+          <div id="quizBox"></div>
+        </section>
+
+        <section class="panel terms-panel">
+          <h2>本课关键词</h2>
+          <div id="lessonTerms" class="term-chips"></div>
+        </section>
+      </aside>
+    </main>
+
+    <section id="encyclopedia" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Pattern Encyclopedia</p>
+          <h2>Al Brooks 形态百科全书</h2>
+        </div>
+        <p>把 Brooks 课程中讲到的主要形态、失败形态、入场逻辑和管理结构集中到一个可查表。胜率是课程语境下的概率口径，不是脱离背景的保证。</p>
+      </div>
+      <div class="encyclopedia-controls">
+        <label class="compact-select">
+          <span>排序</span>
+          <select id="encyclopediaSort">
+            <option value="combined">胜率 + 重要性</option>
+            <option value="probability">按胜率口径</option>
+            <option value="importance">按重要性</option>
+            <option value="difficulty">按执行难度</option>
+            <option value="family">按形态类别</option>
+          </select>
+        </label>
+        <label class="compact-select">
+          <span>类别</span>
+          <select id="encyclopediaFamily"></select>
+        </label>
+        <label class="search-box encyclopedia-search">
+          <span>搜索形态</span>
+          <input id="encyclopediaSearch" type="search" placeholder="MTR、楔形、失败突破、High 2、开盘反转..." />
+        </label>
+        <button id="clearEncyclopediaFilters" class="ghost-button" type="button">重置</button>
+      </div>
+      <div id="encyclopediaStats" class="mini-stat-row"></div>
+      <div class="encyclopedia-layout">
+        <div class="encyclopedia-table-wrap">
+          <div id="encyclopediaList" class="encyclopedia-list" aria-label="形态百科列表"></div>
+        </div>
+        <article id="encyclopediaDetail" class="panel encyclopedia-detail"></article>
+      </div>
+    </section>
+
+    <section id="video-library" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Subtitle Library</p>
+          <h2>全视频文字资料库</h2>
+        </div>
+        <p>这里覆盖全部 SRT 字幕文件。每节课都被压缩成主题、摘要、要点和训练动作，点击左侧课程查看详细总结。</p>
+      </div>
+      <div class="library-controls">
+        <label class="compact-select">
+          <span>模块</span>
+          <select id="moduleFilter"></select>
+        </label>
+        <label class="compact-select">
+          <span>主题</span>
+          <select id="topicFilter"></select>
+        </label>
+        <label class="compact-select">
+          <span>语言</span>
+          <select id="languageFilter"></select>
+        </label>
+        <label class="search-box library-search">
+          <span>搜索字幕摘要</span>
+          <input id="videoSearch" type="search" placeholder="High 2、开盘、宽通道、实际风险..." />
+        </label>
+        <button id="clearVideoFilters" class="ghost-button" type="button">重置筛选</button>
+      </div>
+      <div id="videoSummaryStats" class="mini-stat-row"></div>
+      <div class="library-layout">
+        <div id="videoLessonGrid" class="video-lesson-grid" aria-label="字幕课程列表"></div>
+        <article id="videoLessonDetail" class="panel video-detail"></article>
+      </div>
+    </section>
+
+    <section id="materials" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Materials Map</p>
+          <h2>全资料地图</h2>
+        </div>
+        <p>视频、字幕、PPT、书籍、图表百科、补充课程都按模块归档。你在学习站里先看总结，需要原文件时再从这里进入。</p>
+      </div>
+      <div id="moduleGrid" class="module-grid"></div>
+      <div class="source-layout">
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>核心来源</h2>
+            <span>路线 / PPT / 书籍</span>
+          </div>
+          <div id="sourceList" class="source-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>文件类型</h2>
+            <span>资料规模</span>
+          </div>
+          <div id="kindBars" class="topic-bars compact-bars"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="examples" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Brooks Examples</p>
+          <h2>Al Brooks 形态示例图解</h2>
+        </div>
+        <p>这里用简化图讲结构；真正的 AB 原图截图已经放进形态百科，每个形态 5 张样本，方便你边查边对照。</p>
+      </div>
+      <div class="example-layout">
+        <div id="exampleGrid" class="example-grid"></div>
+        <article id="exampleDetail" class="panel example-detail"></article>
+      </div>
+      <article class="panel atlas-panel">
+        <div class="panel-heading">
+          <h2>图表百科入口</h2>
+          <span>本地 PDF 索引</span>
+        </div>
+        <p class="muted-text">百科条目内已经嵌入 AB 原图截图；这里保留本地图表百科 PDF 入口，方便你继续追溯整页上下文。</p>
+        <div id="chartReferenceList" class="source-list compact-source-list"></div>
+      </article>
+    </section>
+
+    <section id="pattern-lab" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Pattern Lab</p>
+          <h2>形态实验室</h2>
+        </div>
+        <label class="compact-select">
+          <span>排序</span>
+          <select id="patternSort">
+            <option value="probability">按概率口径</option>
+            <option value="sequence">按学习顺序</option>
+            <option value="difficulty">按执行难度</option>
+          </select>
+        </label>
+      </div>
+      <div class="pattern-layout">
+        <div id="patternList" class="pattern-list"></div>
+        <article id="patternDetail" class="panel pattern-detail"></article>
+      </div>
+    </section>
+
+    <section id="drills" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Drills</p>
+          <h2>训练系统</h2>
+        </div>
+        <p>把课程转成动作：开平细节表、500 笔训练、每日复盘。</p>
+      </div>
+      <div class="drill-grid">
+        <article class="panel">
+          <h3>开平细节表</h3>
+          <div id="setupTable" class="setup-table"></div>
+        </article>
+        <article class="panel">
+          <h3>500 笔训练阶梯</h3>
+          <div id="drillSteps" class="drill-steps"></div>
+        </article>
+        <article class="panel wide">
+          <h3>每日复盘清单</h3>
+          <div id="reviewList" class="review-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="glossary" class="wide-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Glossary</p>
+          <h2>术语库</h2>
+        </div>
+        <p>这些词会反复出现。先熟悉它们，后面读图会轻很多。</p>
+      </div>
+      <div id="glossaryGrid" class="glossary-grid"></div>
+    </section>
+
+    <footer class="footer-note">
+      <strong>来源说明：</strong>本课程由当前文件夹内的 Al Brooks 核心课、PPT、书籍、图表百科、Louie/Steven/老K/太妃补充课和学习路线文档整理而成。网页内容用于学习和训练，不构成交易建议。
+    </footer>
+
+    <script src="site-data.js"></script>
+    <script src="encyclopedia-data.js"></script>
+    <script src="ab-chart-assets.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
