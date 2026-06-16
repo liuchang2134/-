@@ -22,7 +22,6 @@
           <a href="#home">首页</a>
           <a href="#course">系统学习</a>
           <a href="#encyclopedia">形态百科</a>
-          <a href="#video-library">资料库</a>
         </nav>
       </div>
     </header>
@@ -32,7 +31,7 @@
         <div class="academy-hero-copy">
           <p class="eyebrow">Al Brooks Price Action System</p>
           <h1>把 Al Brooks 资料整理成一套能学、能查、能复盘的价格行为学院</h1>
-          <p>不再把资料一次性铺开。先学框架，再查形态，需要溯源时进入资料库。</p>
+          <p>不再把资料一次性铺开。先学框架，再查形态，把注意力放在价格行为本身。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#course">开始系统学习</a>
             <a class="secondary-button" href="#encyclopedia">查形态百科</a>
@@ -54,15 +53,6 @@
         <article id="homeContinue" class="continue-card academy-continue"></article>
         <div id="homeRoutes" class="learning-path-grid academy-route-grid"></div>
       </div>
-
-      <div class="section-heading home-heading">
-        <div>
-          <p class="eyebrow">Appendix</p>
-          <h2>附录只保留资料入口</h2>
-        </div>
-        <p>主学习路径不再重复出现。字幕、原文件和术语都放在这里，需要时再进入。</p>
-      </div>
-      <div id="homeModuleGrid" class="home-module-grid"></div>
     </section>
 
     <main id="course" class="course-shell">
@@ -155,78 +145,6 @@
       </div>
       <div id="coreTheoryStats" class="mini-stat-row"></div>
       <div id="coreTheoryGrid" class="core-theory-grid"></div>
-    </section>
-
-    <section id="video-library" class="wide-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Subtitle Library</p>
-          <h2>全视频文字资料库</h2>
-        </div>
-        <p>这里覆盖全部 SRT 字幕文件。每节课都被压缩成主题、摘要、要点和训练动作，点击左侧课程查看详细总结。</p>
-      </div>
-      <div class="library-controls">
-        <label class="compact-select">
-          <span>模块</span>
-          <select id="moduleFilter"></select>
-        </label>
-        <label class="compact-select">
-          <span>主题</span>
-          <select id="topicFilter"></select>
-        </label>
-        <label class="compact-select">
-          <span>语言</span>
-          <select id="languageFilter"></select>
-        </label>
-        <label class="search-box library-search">
-          <span>搜索字幕摘要</span>
-          <input id="videoSearch" type="search" placeholder="High 2、开盘、宽通道、实际风险..." />
-        </label>
-        <button id="clearVideoFilters" class="ghost-button" type="button">重置筛选</button>
-      </div>
-      <div id="videoSummaryStats" class="mini-stat-row"></div>
-      <div class="library-layout">
-        <div id="videoLessonGrid" class="video-lesson-grid" aria-label="字幕课程列表"></div>
-        <article id="videoLessonDetail" class="panel video-detail"></article>
-      </div>
-    </section>
-
-    <section id="materials" class="wide-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Materials Map</p>
-          <h2>全资料地图</h2>
-        </div>
-        <p>视频、字幕、PPT、书籍、图表百科、补充课程都按模块归档。你在学习站里先看总结，需要原文件时再从这里进入。</p>
-      </div>
-      <div id="moduleGrid" class="module-grid"></div>
-      <div class="source-layout">
-        <article class="panel">
-          <div class="panel-heading">
-            <h2>核心来源</h2>
-            <span>路线 / PPT / 书籍</span>
-          </div>
-          <div id="sourceList" class="source-list"></div>
-        </article>
-        <article class="panel">
-          <div class="panel-heading">
-            <h2>文件类型</h2>
-            <span>资料规模</span>
-          </div>
-          <div id="kindBars" class="topic-bars compact-bars"></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="glossary" class="wide-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Glossary</p>
-          <h2>术语库</h2>
-        </div>
-        <p>这些词会反复出现。先熟悉它们，后面读图会轻很多。</p>
-      </div>
-      <div id="glossaryGrid" class="glossary-grid"></div>
     </section>
 
     <footer class="footer-note">

@@ -909,10 +909,6 @@ function init() {
   renderEncyclopediaFilters();
   renderEncyclopedia();
   renderCoreTheory();
-  renderVideoFilters();
-  renderVideoLibrary();
-  renderMaterials();
-  renderGlossary();
   bindEvents();
 }
 
@@ -940,33 +936,6 @@ function bindEvents() {
     $("#encyclopediaFamily").value = "all";
     $("#encyclopediaSearch").value = "";
     renderEncyclopedia();
-  });
-  $("#moduleFilter").addEventListener("change", (event) => {
-    state.libraryModule = event.target.value;
-    renderVideoLibrary();
-  });
-  $("#topicFilter").addEventListener("change", (event) => {
-    state.libraryTopic = event.target.value;
-    renderVideoLibrary();
-  });
-  $("#languageFilter").addEventListener("change", (event) => {
-    state.libraryLanguage = event.target.value;
-    renderVideoLibrary();
-  });
-  $("#videoSearch").addEventListener("input", (event) => {
-    state.libraryQuery = event.target.value.trim().toLowerCase();
-    renderVideoLibrary();
-  });
-  $("#clearVideoFilters").addEventListener("click", () => {
-    state.libraryModule = "all";
-    state.libraryTopic = "all";
-    state.libraryLanguage = "all";
-    state.libraryQuery = "";
-    $("#moduleFilter").value = "all";
-    $("#topicFilter").value = "all";
-    $("#languageFilter").value = "all";
-    $("#videoSearch").value = "";
-    renderVideoLibrary();
   });
 }
 
@@ -1027,18 +996,6 @@ function renderHome() {
     </a>
   `).join("");
 
-  $("#homeModuleGrid").innerHTML = [
-    ["字幕库", "全视频摘要", "按模块、主题和语言检索全部视频文字资料。", "#video-library", "溯源"],
-    ["资料地图", "原文件索引", "需要 PDF、PPT、书籍和补充课时再进入。", "#materials", "原始资料"],
-    ["术语库", "概念速查", "忘记 Always In、MTR、TBTL 等术语时再查。", "#glossary", "附录"]
-  ].map(([title, label, text, href, badge]) => `
-    <a class="home-module-card searchable" href="${href}" data-search="${html(`${title} ${label} ${text} ${badge}`)}">
-      <span>${html(badge)}</span>
-      <strong>${html(title)}</strong>
-      <em>${html(label)}</em>
-      <p>${html(text)}</p>
-    </a>
-  `).join("");
 }
 
 function renderLessonList() {
