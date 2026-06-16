@@ -2437,6 +2437,288 @@ body {
   margin: 0;
 }
 
+.core-theory-grid {
+  display: block;
+}
+
+.core-theory-layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.core-theory-index {
+  position: sticky;
+  top: 86px;
+  display: grid;
+  gap: 6px;
+  max-height: calc(100vh - 106px);
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.core-index-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 6px 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.core-index-head strong {
+  color: var(--teal);
+}
+
+.core-theory-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 54px;
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 64px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.core-theory-row:hover,
+.core-theory-row.active {
+  border-color: #b7d6d1;
+  background: #eef7f6;
+}
+
+.core-theory-row.active .rank-number {
+  background: var(--teal);
+  color: #fff;
+}
+
+.core-index-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.core-index-title strong,
+.core-index-title em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.core-index-title strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.core-index-title em {
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.core-index-score {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+}
+
+.core-index-score b {
+  color: var(--gold);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.core-index-score small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.core-theory-detail {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.core-theory-hero,
+.core-theory-map,
+.core-learning-block,
+.core-related-panel,
+.core-source-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.core-theory-hero {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.core-theory-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+}
+
+.core-map-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--line);
+  background: #fbfcfd;
+}
+
+.core-map-item:last-child {
+  border-right: 0;
+}
+
+.core-map-item span,
+.core-lecture span {
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.core-map-item strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.core-lecture {
+  display: grid;
+  gap: 9px;
+  padding: 16px;
+  border: 1px solid #bdd8d3;
+  border-radius: 8px;
+  background: #f7fbfa;
+}
+
+.core-lecture p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.core-theory-module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.core-learning-block {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  box-shadow: none;
+}
+
+.core-learning-block.wide {
+  grid-column: 1 / -1;
+  background: #f7fbfa;
+  border-color: #bdd8d3;
+}
+
+.core-learning-block > span {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 26px;
+  border-radius: 6px;
+  background: #e7f4f2;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.core-learning-block h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.core-learning-block ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.core-learning-block li {
+  color: var(--muted);
+  line-height: 1.68;
+}
+
+.core-related-panel,
+.core-source-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  box-shadow: none;
+}
+
+.core-related-patterns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.core-pattern-link {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.core-pattern-link:hover {
+  border-color: #b7d6d1;
+  background: #eef7f6;
+}
+
+.core-pattern-link strong,
+.core-pattern-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.core-pattern-link span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.core-source-panel .related-course-labels {
+  margin-top: -2px;
+}
+
+.core-source-panel .theory-source-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .video-insight-card {
   display: grid;
   gap: 14px;
@@ -3416,6 +3698,25 @@ body {
     grid-template-columns: 280px minmax(0, 1fr);
   }
 
+  .core-theory-layout {
+    grid-template-columns: 270px minmax(0, 1fr);
+  }
+
+  .core-theory-map,
+  .core-theory-module-grid,
+  .core-source-panel .theory-source-list {
+    grid-template-columns: 1fr;
+  }
+
+  .core-map-item {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .core-map-item:last-child {
+    border-bottom: 0;
+  }
+
   .course-intro {
     display: grid;
   }
@@ -3425,6 +3726,23 @@ body {
   .academy-route-grid,
   .primary-encyclopedia .encyclopedia-layout {
     grid-template-columns: 1fr;
+  }
+
+  .core-theory-layout,
+  .core-related-patterns {
+    grid-template-columns: 1fr;
+  }
+
+  .core-theory-index {
+    position: static;
+    max-height: none;
+  }
+
+  .core-theory-head,
+  .core-theory-top,
+  .related-heading {
+    display: grid;
+    justify-content: stretch;
   }
 
   .primary-encyclopedia .section-heading h2 {
