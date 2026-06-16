@@ -909,6 +909,10 @@ function init() {
   renderEncyclopediaFilters();
   renderEncyclopedia();
   renderCoreTheory();
+  renderVideoFilters();
+  renderVideoLibrary();
+  renderMaterials();
+  renderGlossary();
   bindEvents();
 }
 
@@ -936,6 +940,33 @@ function bindEvents() {
     $("#encyclopediaFamily").value = "all";
     $("#encyclopediaSearch").value = "";
     renderEncyclopedia();
+  });
+  $("#moduleFilter").addEventListener("change", (event) => {
+    state.libraryModule = event.target.value;
+    renderVideoLibrary();
+  });
+  $("#topicFilter").addEventListener("change", (event) => {
+    state.libraryTopic = event.target.value;
+    renderVideoLibrary();
+  });
+  $("#languageFilter").addEventListener("change", (event) => {
+    state.libraryLanguage = event.target.value;
+    renderVideoLibrary();
+  });
+  $("#videoSearch").addEventListener("input", (event) => {
+    state.libraryQuery = event.target.value.trim().toLowerCase();
+    renderVideoLibrary();
+  });
+  $("#clearVideoFilters").addEventListener("click", () => {
+    state.libraryModule = "all";
+    state.libraryTopic = "all";
+    state.libraryLanguage = "all";
+    state.libraryQuery = "";
+    $("#moduleFilter").value = "all";
+    $("#topicFilter").value = "all";
+    $("#languageFilter").value = "all";
+    $("#videoSearch").value = "";
+    renderVideoLibrary();
   });
 }
 
