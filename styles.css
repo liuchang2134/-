@@ -3500,6 +3500,7 @@ body {
 }
 
 .primary-encyclopedia {
+  width: min(1800px, 100%);
   padding-top: 18px;
 }
 
@@ -3527,6 +3528,32 @@ body {
 
 .primary-encyclopedia .encyclopedia-layout {
   grid-template-columns: 300px minmax(0, 1fr);
+}
+
+.primary-encyclopedia .ab-chart-gallery {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+
+.primary-encyclopedia .ab-chart-gallery figure,
+.primary-encyclopedia .ab-chart-gallery figure:first-child,
+.primary-encyclopedia .annotated-chart,
+.primary-encyclopedia .annotated-chart a {
+  width: 100%;
+  max-width: none;
+}
+
+.primary-encyclopedia .ab-chart-card a {
+  overflow: visible;
+}
+
+.primary-encyclopedia .ab-chart-card img {
+  width: 100%;
+  max-width: none;
+}
+
+.primary-encyclopedia .annotated-figure {
+  padding: clamp(10px, 1vw, 18px);
 }
 
 .academy-route-grid {
