@@ -936,6 +936,226 @@ const chanTheoryModule = {
   ]
 };
 
+chanTheoryModule.meta = [
+  ["页数", "205 页"],
+  ["站内课程", "10 章"],
+  ["核心", "结构 / 级别 / 中枢 / 背驰"],
+  ["练习", "每章都有复盘动作"]
+];
+chanTheoryModule.summary = "这个模块已经把 PDF 消化成站内课程。学习时不用先打开原文：先用左侧目录按顺序学概念，再在每章里看定义、判断规则、常见误区、复盘练习和 Brooks 对照。PDF 只作为来源保留。";
+chanTheoryModule.lessons = [
+  {
+    id: "discipline",
+    phase: "总纲",
+    title: "交易纪律：买点买，卖点卖",
+    subtitle: "缠论不是预测故事，而是让你等结构给出动作。",
+    pages: "p.1-18",
+    takeaway: "市场里最危险的不是看错一次，而是没有操作程序。总纲反复强调：不要靠喜好、基本面安慰、庄家故事或临时幻想交易；只有买卖点和级别能给你行动边界。",
+    body: [
+      "这部分的核心是把交易从“想当然”改成“程序化”。出现买点，再差的票也可以纳入观察；出现卖点，再喜欢的票也要按规则处理。所谓“市场无需分析，只需看和干”，不是不思考，而是结构已经给出分类后，不再用主观理由覆盖结构。",
+      "它和 Brooks 的共同点很强：Brooks 也不会因为一根漂亮 K 线就交易，而是先看背景、位置、信号、止损和目标。缠论这里对应的是：先确认级别和买卖点，没点就等待。"
+    ],
+    definitions: [
+      ["买点", "结构给出可承担风险的入场窗口，不是价格跌得多就可以买。"],
+      ["卖点", "结构给出该退出或减仓的位置，不是主观觉得涨够了。"],
+      ["当下", "只根据当前已经完成和正在生成的结构行动，不拿未来想象替代证据。"]
+    ],
+    rules: ["没买点不买，没卖点不卖。", "基本面、消息和偏好只能做背景，不能替代结构。", "进入市场后先问自己：我做的是哪个级别？这个级别的买卖点出现了吗？"],
+    mistakes: ["把下跌当便宜。", "把上涨当强势而追高。", "用“庄家”“题材”“价值”解释已经坏掉的结构。"],
+    practice: "找 10 次自己想冲动交易的位置，只写一句：它有没有清晰买卖点？如果没有，把它标成“等待”。",
+    brooks: "对应 Brooks 的交易者方程：没有清楚背景、触发、止损、目标，就不是一笔交易。"
+  },
+  {
+    id: "structure",
+    phase: "基础",
+    title: "结构分类：趋势、盘整和走势连接",
+    subtitle: "缠论先把行情拆成结构，再谈买卖点。",
+    pages: "p.26-28 / p.64-67 / p.99-104",
+    takeaway: "这份资料把缠论理解为结构分类学。先判断走势类型，再判断它如何和前后结构连接；不要只在图上画线，而要知道这段走势在整个市场结构里扮演什么角色。",
+    body: [
+      "结构包括四层：结构的形态，结构之间的关系，结构的组合，结构转折点。所谓走势类型连接，就是一段走势结束后，后面只能进入另一段上、下或盘的结构演化。你要训练的是：看到一张图，能说出它现在是延伸、扩展、转折前，还是中枢震荡。",
+      "资料多次批评机械画笔线段，因为画得漂亮不等于还原走势。真正目标是把走势当前的位置、方向和级别搞清楚。"
+    ],
+    definitions: [
+      ["趋势", "同级别至少两个同向中枢构成的方向性结构。"],
+      ["盘整", "围绕中枢震荡的结构，方向不如趋势明确。"],
+      ["走势连接", "一个结构结束后和下一个结构衔接的方式，是判断后续分类的核心。"]
+    ],
+    rules: ["先找结构，不先找形态名字。", "能组合成趋势时，不要随意拆成零碎盘整。", "未完成走势优先用中枢扩展法锁定方向。"],
+    mistakes: ["随便截取一段图就分析。", "只画笔线段，却不知道走势在大级别什么位置。", "把所有重叠都当成同一个级别的中枢。"],
+    practice: "拿一张日线图，先不画任何买卖点，只给最近 3 段走势贴标签：上、下、盘。再写出它们之间怎么连接。",
+    brooks: "对应 Brooks 的市场周期：突破、通道、交易区间。Brooks 看背景，缠论看走势类型。"
+  },
+  {
+    id: "fractal-stroke",
+    phase: "基础",
+    title: "分型、笔、线段：只作为结构零件",
+    subtitle: "它们是观察工具，不是最终交易理由。",
+    pages: "p.28-32 / p.75-78 / p.159-160",
+    takeaway: "分型、笔、线段可以帮助你组织走势，但资料反复提醒：不要停在画法争论里。它们的价值是还原次级别走势，服务中枢和级别判断。",
+    body: [
+      "分型是最小的转折识别：顶分型和底分型由三根 K 线构成。笔和线段把这些小转折连起来，但真实走势经常不标准，所以资料会用 K 线重叠、圈圈、中枢来修正机械画法。",
+      "一站式学习时，你不需要先成为画线段高手。更实用的顺序是：分型识别局部高低点，笔和线段帮助看次级别走势，最后回到中枢、级别、背驰。"
+    ],
+    definitions: [
+      ["顶分型", "中间 K 线高点最高、低点也较高，提示局部上方压力。"],
+      ["底分型", "中间 K 线低点最低、高点也较低，提示局部下方支撑。"],
+      ["笔/线段", "把分型连接成更高一级结构的工具，必须服从中枢和级别判断。"]
+    ],
+    rules: ["分型只提示局部，不等于买卖点。", "笔线段不清楚时，升级到大级别图看整体结构。", "画线服务交易判断，不能让画法本身变成目的。"],
+    mistakes: ["把第一个顶分型当成必然见顶。", "纠结笔线段定义，忽略中枢是否已经形成。", "用公式指标自动画笔，反而丢掉结构感。"],
+    practice: "选一段 100 根 K 线，先标顶底分型，再只保留影响中枢判断的关键分型，把无关噪音删掉。",
+    brooks: "对应 Brooks 的信号 K：一根 K 线或局部形态必须回到背景里判断。"
+  },
+  {
+    id: "center",
+    phase: "核心",
+    title: "中枢：结构学习的中心",
+    subtitle: "中枢决定走势级别，也决定你在震荡还是趋势里。",
+    pages: "p.40-59 / p.100-104 / p.183-186",
+    takeaway: "中枢是价格重叠和平衡区，是缠论判断级别、走势和买卖点的中心。找不到中枢，后面所有背驰、三买三卖、扩展都会乱。",
+    body: [
+      "中枢不是普通横盘，而是由次级别走势重叠形成的结构区域。它告诉你市场在什么价格区间反复交换筹码，也告诉你行情离开这个区域后，是延伸趋势，还是进入更大级别盘整。",
+      "资料强调：走势划分的关键是中枢划分。连接段和背驰段可以有多种组合，但中枢必须尽量正确。未完成走势中，用中枢扩展法常常比机械同级别分解更能锁定方向。"
+    ],
+    definitions: [
+      ["中枢", "至少三段次级别走势重叠形成的结构区间。"],
+      ["中枢震荡", "价格围绕中枢上下摆动，买卖点通常是低级别的。"],
+      ["中枢扩展", "同级别中枢或多段结构重叠后升级为更大级别中枢。"]
+    ],
+    rules: ["先找最大、最清楚的中枢。", "中枢级别决定走势级别。", "没有三买三卖，很多突破仍可能只是中枢震荡。"],
+    mistakes: ["把所有横盘都当中枢。", "中枢画好后不敢随走势变化调整。", "不区分中枢区间和中枢波动高低点。"],
+    practice: "找一段明显震荡行情，标出中枢区间、波动高低点、离开中枢的第一段走势和回抽是否进入中枢。",
+    brooks: "对应 Brooks 的交易区间和磁力位：区间内部双向，离开区间后看突破是否有跟随。"
+  },
+  {
+    id: "timeframe",
+    phase: "核心",
+    title: "级别：先定你到底在交易哪一层",
+    subtitle: "级别不是时间周期本身，而是走势结构的层级。",
+    pages: "p.69-72 / p.79-84 / p.91-99",
+    takeaway: "级别决定方向、机会和风险。大级别给方向，小级别给入场；小级别推动大级别发展，大级别保护小级别交易空间。",
+    body: [
+      "资料里很重要的一句话是：级别和图形周期不是一回事。1 分钟走势可以在更大图上表现为线段或笔；30 分钟走势也可能在日线图上只是一笔。你看哪个图，是为了观察方便，不是级别本身。",
+      "实战顺序是从大到小：先看周、日、30 分钟锁定大位置，再到 5 分钟或 1 分钟找内部结构。不要只看小周期，容易在噪音里迷路；也不要只看大周期，否则入场太粗。"
+    ],
+    definitions: [
+      ["本级别", "你当前计划交易和管理的主要结构层级。"],
+      ["次级别", "构成本级别走势的下一级结构，用来找入场和背驰段。"],
+      ["级别升级", "中枢扩展或走势组合后，原结构需要放到更大级别理解。"]
+    ],
+    rules: ["交易前写清楚操作级别。", "大级别决定方向，小级别决定触发。", "走势升级后，必须换更大视角重新看结构性质。"],
+    mistakes: ["把 5 分钟图等同于 5 分钟级别。", "小级别信号逆着大级别硬做。", "做短线却拿长线理由扛亏损。"],
+    practice: "同一只标的同时打开周、日、30、5 分钟，写出每个图上最清晰的中枢和当前走势位置。",
+    brooks: "对应 Brooks 的多时间框架背景：小周期信号必须接受大周期背景过滤。"
+  },
+  {
+    id: "divergence",
+    phase: "核心",
+    title: "背驰：结构到位后的力度衰竭",
+    subtitle: "不要把背驰简化成 MACD 背离。",
+    pages: "p.14-18 / p.64-72 / p.119-120",
+    takeaway: "背驰的重点是结构和力度对比。指标可以辅助，但不能代替结构。结构不到位，指标背离也只是噪音；结构到位，指标只是帮你确认力度是否衰竭。",
+    body: [
+      "资料反复讲“没有趋势，没有背驰”。这里的意思是：真正能引发转折的背驰，通常发生在趋势结构或背驰段内部。你要先确认中枢、级别和背驰段，再比较力度。",
+      "背驰后的结果不是只有反转一种。它可能导致最后一个中枢扩展，可能变成更大级别盘整，也可能形成反趋势。因此，背驰是警报，不是无条件反向命令。"
+    ],
+    definitions: [
+      ["标准背驰", "本级别和内部级别逐层出现力度衰竭，较少见但更清晰。"],
+      ["盘整背驰", "中枢震荡或盘整结构里的力度衰竭。"],
+      ["力度对比", "比较中枢两端同级别走势的推进强弱，指标面积只是辅助。"]
+    ],
+    rules: ["先定级别，再谈背驰。", "先看结构是否完成，再看指标。", "背驰后等待买卖点或结构确认，尤其注意三买三卖。"],
+    mistakes: ["只看 MACD 红绿柱缩短就交易。", "看到背驰就以为必然大反转。", "比较了不同级别的两段走势。"],
+    practice: "找 20 个你认为的背驰，把它们分成三类：趋势背驰、盘整背驰、只是指标背离。只保留前两类继续研究。",
+    brooks: "对应 Brooks 的高潮反转和 MTR：反转不是因为涨多跌多，而是趋势推进失败并出现二次证据。"
+  },
+  {
+    id: "entries",
+    phase: "交易",
+    title: "三类买卖点：结构位置决定交易性质",
+    subtitle: "一买更主动，二买三买更多是确认。",
+    pages: "p.70-84 / p.189-194 / p.205",
+    takeaway: "三类买卖点是缠论把结构转成交易动作的地方。一买来自背驰转折，二买来自转折后的次级别回抽，三买来自离开中枢后的回抽确认。",
+    body: [
+      "一买买的是本级别转折，通常最主动，但也最需要你对背驰和级别判断准确。二买、三买买的是次级别一买，本质上更像确认交易：错过一买后，等市场证明转折或突破有效。",
+      "三买三卖的关键不是回抽到某条线，而是回抽不进入中枢区间。资料还强调，扩展中枢后的三买三卖级别会升级，不能把小级别回抽误当大级别确认。"
+    ],
+    definitions: [
+      ["第一类买卖点", "趋势背驰或转折处产生的本级别买卖点。"],
+      ["第二类买卖点", "一买/一卖后第一次次级别回抽形成的确认点。"],
+      ["第三类买卖点", "离开中枢后回抽不进中枢区间，确认中枢结束或方向延伸。"]
+    ],
+    rules: ["一买看背驰，二买看回抽，三买看是否回到中枢。", "二买三买本质上常是次级别一买。", "中枢升级后，买卖点级别也要升级。"],
+    mistakes: ["把任何回踩都叫三买。", "不分中枢区间和波动高低点。", "把小级别买点当大级别反转点。"],
+    practice: "同一段趋势里标出一买、二买、三买的候选位置，再写每一个失败时应该如何退出。",
+    brooks: "对应 Brooks 的反转入场、突破回踩和失败突破：位置不同，交易意义完全不同。"
+  },
+  {
+    id: "small-to-large",
+    phase: "进阶",
+    title: "小转大：没有标准背驰也可能转折",
+    subtitle: "大级别没背驰，内部小级别先发生变化。",
+    pages: "p.84-91",
+    takeaway: "小转大是这份资料里很实战的一章：很多转折并不呈现标准背驰，而是背驰段内部的小级别先完成结构，进而推动大级别改变。",
+    body: [
+      "小转大不是“小级别变成大级别”这么简单，而是大级别没有标准背驰时，内部小级别背驰、中枢完成或三买三卖触发，使走势提前转折。它解释了为什么有些行情看起来没到标准背驰，却已经转向。",
+      "判断小转大，必须回到内部结构。看背驰段里有没有次级别中枢，是否出现三买三卖，是否形成可以升级的结构。资料也会用 MACD 金叉作为辅助，但核心仍然是结构。"
+    ],
+    definitions: [
+      ["小转大", "大级别未标准背驰，但内部小级别结构触发大级别方向变化。"],
+      ["非标准背驰", "背驰不在表层级别出现，而在内部小级别发生。"],
+      ["中枢完成", "小转大成立前，内部中枢通常必须完成。"]
+    ],
+    rules: ["大级别看不懂时，进入背驰段内部看小级别。", "没有中枢完成，不轻易判定小转大。", "小转大后要等待结构确认，不能只凭感觉抢反转。"],
+    mistakes: ["把所有提前转向都叫小转大。", "忽略内部结构，只看指标金叉。", "没有确认三买三卖就提前下结论。"],
+    practice: "找 5 个没有标准背驰却转折的例子，拆到小一级别，看内部是否先出现中枢完成或背驰。",
+    brooks: "对应 Brooks 的低级别 MTR：大周期还没完全反转，小周期已经出现二次入场和控制权转换。"
+  },
+  {
+    id: "chart-reading",
+    phase: "流程",
+    title: "看图流程：从大级别到当下位置",
+    subtitle: "先锁定大方向，再找当前结构位置。",
+    pages: "p.91-104",
+    takeaway: "看图不要从当前 K 线开始，也不要随便截一段。先看大级别图锁定整体位置，再下钻到小级别定位中枢、背驰段和买卖点。",
+    body: [
+      "资料给出的看图顺序很明确：首先看大级别图，确认当前走势在大结构里的位置；其次大、小级别联立，明确当前是中枢构造、离开中枢、背驰段，还是新的走势连接。",
+      "分析永远聚焦未完成的走势。已经完成的部分只作为结构背景，不需要反复纠缠。真正要回答的是：最后一个走势完成了吗？如果没完成，它可能怎么分类？"
+    ],
+    definitions: [
+      ["大级别定位", "先用更高周期图确认当前走势属于哪个大结构。"],
+      ["区间套", "用次级别逐层收缩大级别转折范围。"],
+      ["当下分类", "对未完成走势列出可能路径，而不是提前押单一路径。"]
+    ],
+    rules: ["从周、日、30、5 逐层看。", "只分析未完成走势。", "如果小图太乱，就升级到大图。", "最后落到：中枢在哪里，背驰段在哪里，买卖点在哪里。"],
+    mistakes: ["只看当前周期。", "从随机截取的一段开始解释。", "把已经完成的走势反复分析，忽略当下正在生成的结构。"],
+    practice: "做一个固定复盘模板：大级别方向、当前中枢、离开方向、背驰段、买卖点、失效条件。每天只填 3 张图。",
+    brooks: "对应 Brooks 的背景优先：先判断趋势/区间/通道，再判断当前信号能不能交易。"
+  },
+  {
+    id: "integration",
+    phase: "整合",
+    title: "和 Brooks 合并使用：不要混成一锅粥",
+    subtitle: "缠论管结构层级，Brooks 管当下交易质量。",
+    pages: "全书综合",
+    takeaway: "最实用的合并方式不是把术语混在一起，而是分工：缠论帮你定位大结构和级别，Brooks 帮你判断这一笔交易有没有概率、空间、止损和跟随。",
+    body: [
+      "一张图可以先用缠论回答四个问题：现在是什么级别？中枢在哪里？是否在背驰段？买卖点属于哪一类？然后再用 Brooks 回答四个问题：市场是趋势还是区间？信号 K 质量如何？止损在哪里？目标够不够？",
+      "这样做能避免两种极端：只学缠论会容易沉迷划分，只学 Brooks 又可能忽略更大结构层级。组合后，结构给方向和位置，价格行为给触发和管理。"
+    ],
+    definitions: [
+      ["结构层级", "用缠论定位走势、中枢、级别和买卖点。"],
+      ["交易质量", "用 Brooks 过滤背景、信号、风险收益和失败条件。"],
+      ["双重确认", "两套语言指向同一方向时，交易质量更高；相互冲突时，降低仓位或等待。"]
+    ],
+    rules: ["先缠论定位，再 Brooks 触发。", "冲突时不硬做。", "任何交易都必须写清楚止损、目标和失效条件。"],
+    mistakes: ["把所有 Brooks 形态硬套成缠论买卖点。", "用缠论大级别理由去扛 Brooks 已经失败的入场。", "用太多术语掩盖没有交易计划。"],
+    practice: "选 5 张 Brooks 图表百科里的原图，每张同时写：缠论结构位置 + Brooks 入场质量。只有两边都说得通才标为可交易。",
+    brooks: "这是整个网站的最终用法：图表百科是主工作区，缠论模块是结构辅助层。"
+  }
+];
+
 const state = {
   lesson: Number(localStorage.getItem("activeLesson") || 0),
   pattern: "breakout",
@@ -950,6 +1170,7 @@ const state = {
   encyclopediaFamily: "all",
   encyclopediaQuery: "",
   activeEncyclopediaId: null,
+  activeChanLessonId: "discipline",
   activeCoreTheoryId: "market-cycle"
 };
 
@@ -1097,21 +1318,36 @@ function renderHome() {
 
 function renderChanTheory() {
   const module = chanTheoryModule;
+  const lessons = module.lessons || [];
+  if (!lessons.length) return;
+  if (!lessons.some((lesson) => lesson.id === state.activeChanLessonId)) {
+    state.activeChanLessonId = lessons[0].id;
+  }
+  const activeLesson = lessons.find((lesson) => lesson.id === state.activeChanLessonId) || lessons[0];
+  const activeIndex = lessons.findIndex((lesson) => lesson.id === activeLesson.id);
+  const definitionCount = lessons.reduce((sum, lesson) => sum + (lesson.definitions?.length || 0), 0);
+  const practiceCount = lessons.filter((lesson) => lesson.practice).length;
+
   $("#chanTheoryModule").innerHTML = `
-    <article class="chan-layout searchable" data-search="${html(searchText(module))}">
-      <section class="chan-hero">
+    <article class="chan-layout chan-course searchable" data-search="${html(searchText({ title: module.title, summary: module.summary, lessons, comparison: module.comparison }))}">
+      <section class="chan-hero chan-course-hero">
         <div>
-          <p class="eyebrow">PDF Supplement</p>
-          <h3>${html(module.title)}</h3>
-          <p class="chan-subtitle">${html(module.subtitle)}</p>
+          <p class="eyebrow">One-stop Chan Theory Course</p>
+          <h3>缠中说禅站内课程</h3>
+          <p class="chan-subtitle">结构、级别、中枢、背驰、买卖点，一次学完</p>
           <p>${html(module.summary)}</p>
           <div class="chan-actions">
-            <a class="primary-button" href="${html(module.file)}" target="_blank" rel="noreferrer">打开 PDF 原文</a>
-            <a class="secondary-button" href="#encyclopedia">回到 Brooks 图表百科</a>
+            <button class="primary-button" type="button" data-chan-start>从第一章开始</button>
+            <a class="secondary-button" href="${html(module.file)}" target="_blank" rel="noreferrer">PDF 来源</a>
           </div>
         </div>
         <div class="chan-meta-grid">
-          ${module.meta.map(([label, value]) => `
+          ${[
+            ["站内课程", `${lessons.length} 章`],
+            ["核心定义", `${definitionCount} 个`],
+            ["复盘动作", `${practiceCount} 组`],
+            ["PDF 来源", "205 页"]
+          ].map(([label, value]) => `
             <div class="chan-meta-card">
               <span>${html(label)}</span>
               <strong>${html(value)}</strong>
@@ -1120,42 +1356,32 @@ function renderChanTheory() {
         </div>
       </section>
 
-      <section class="chan-card">
-        <div class="panel-heading">
-          <h3>这份资料讲什么</h3>
-          <span>结构优先</span>
-        </div>
-        <div class="chan-concept-grid">
-          ${module.concepts.map((concept, index) => `
-            <article class="chan-concept-card">
-              <span>${String(index + 1).padStart(2, "0")}</span>
-              <h4>${html(concept.title)}</h4>
-              <p>${html(concept.text)}</p>
-            </article>
+      <section class="chan-course-shell">
+        <aside class="chan-course-index" aria-label="缠论站内课程目录">
+          <div class="core-index-head">
+            <span>课程目录</span>
+            <strong>${lessons.length} 章</strong>
+          </div>
+          ${lessons.map((lesson, index) => `
+            <button class="chan-lesson-row ${lesson.id === activeLesson.id ? "active" : ""}" type="button" data-chan-lesson="${html(lesson.id)}">
+              <span class="rank-number">${String(index + 1).padStart(2, "0")}</span>
+              <span class="core-index-title">
+                <strong>${html(lesson.title)}</strong>
+                <em>${html(lesson.phase)} · ${html(lesson.subtitle)}</em>
+              </span>
+              <span class="chan-page-mark">${html(lesson.pages)}</span>
+            </button>
           `).join("")}
+        </aside>
+        <div class="chan-lesson-detail">
+          ${renderChanLessonDetail(activeLesson, activeIndex)}
         </div>
       </section>
 
-      <section class="chan-card">
+      <section class="chan-card chan-integration-card">
         <div class="panel-heading">
-          <h3>怎么放进本网站学习</h3>
-          <span>不要混乱术语</span>
-        </div>
-        <div class="chan-path">
-          ${module.readingPath.map(([step, title, text]) => `
-            <div class="chan-path-row">
-              <span>${step}</span>
-              <strong>${html(title)}</strong>
-              <p>${html(text)}</p>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-
-      <section class="chan-card">
-        <div class="panel-heading">
-          <h3>和 Brooks 怎么对照</h3>
-          <span>一张图两套语言</span>
+          <h3>和 Brooks 主百科怎么合并使用</h3>
+          <span>缠论管结构，Brooks 管交易质量</span>
         </div>
         <div class="chan-compare-table">
           ${module.comparison.map(([topic, brooks, chan]) => `
@@ -1169,6 +1395,76 @@ function renderChanTheory() {
       </section>
     </article>
   `;
+
+  $$(".chan-lesson-row").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.activeChanLessonId = button.dataset.chanLesson;
+      renderChanTheory();
+    });
+  });
+  $("[data-chan-start]")?.addEventListener("click", () => {
+    state.activeChanLessonId = lessons[0].id;
+    renderChanTheory();
+  });
+}
+
+function renderChanLessonDetail(lesson, index) {
+  return `
+    <article class="chan-lesson-hero searchable" data-search="${html(searchText(lesson))}">
+      <div class="chan-lesson-kicker">
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <strong>${html(lesson.phase)} · ${html(lesson.pages)}</strong>
+      </div>
+      <h3>${html(lesson.title)}</h3>
+      <p class="chan-lesson-subtitle">${html(lesson.subtitle)}</p>
+      <div class="chan-takeaway">
+        <strong>本章抓什么</strong>
+        <p>${html(lesson.takeaway)}</p>
+      </div>
+      <div class="chan-body-copy">
+        ${(lesson.body || []).map((paragraph) => `<p>${html(paragraph)}</p>`).join("")}
+      </div>
+    </article>
+
+    <section class="chan-lesson-grid">
+      <article class="chan-study-block">
+        <span>01</span>
+        <h4>核心定义</h4>
+        <div class="chan-definition-list">
+          ${(lesson.definitions || []).map(([term, text]) => `
+            <div class="chan-definition">
+              <strong>${html(term)}</strong>
+              <p>${html(text)}</p>
+            </div>
+          `).join("")}
+        </div>
+      </article>
+      <article class="chan-study-block">
+        <span>02</span>
+        <h4>判断规则</h4>
+        ${renderChanList(lesson.rules)}
+      </article>
+      <article class="chan-study-block">
+        <span>03</span>
+        <h4>常见误区</h4>
+        ${renderChanList(lesson.mistakes)}
+      </article>
+      <article class="chan-study-block">
+        <span>04</span>
+        <h4>本章复盘动作</h4>
+        <p>${html(lesson.practice)}</p>
+      </article>
+      <article class="chan-study-block wide">
+        <span>05</span>
+        <h4>和 Al Brooks 怎么对照理解</h4>
+        <p>${html(lesson.brooks)}</p>
+      </article>
+    </section>
+  `;
+}
+
+function renderChanList(items = []) {
+  return `<ul>${items.map((item) => `<li>${html(item)}</li>`).join("")}</ul>`;
 }
 
 function renderLessonList() {

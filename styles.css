@@ -4045,3 +4045,264 @@ h4,
     grid-template-columns: 1fr;
   }
 }
+
+/* Chan one-stop course. This overrides the older PDF-guide layout above. */
+.chan-course {
+  gap: 14px;
+}
+
+.chan-course-hero {
+  grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+}
+
+.chan-course-hero h3 {
+  font-size: clamp(1.55rem, 1.13rem + 1vw, 2.2rem);
+}
+
+.chan-actions .primary-button {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.chan-course-shell {
+  display: grid;
+  grid-template-columns: clamp(16rem, 21vw, 19rem) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.chan-course-index {
+  position: sticky;
+  top: 86px;
+  display: grid;
+  gap: 6px;
+  max-height: calc(100vh - 106px);
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chan-lesson-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.chan-lesson-row:hover,
+.chan-lesson-row.active {
+  border-color: #b7d6d1;
+  background: #eef7f6;
+}
+
+.chan-lesson-row.active .rank-number {
+  background: var(--teal);
+  color: #fff;
+}
+
+.chan-page-mark {
+  grid-column: 2;
+  margin-top: -2px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.chan-lesson-detail {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.chan-lesson-hero,
+.chan-study-block {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.chan-lesson-hero {
+  display: grid;
+  gap: 14px;
+  padding: clamp(1rem, 0.78rem + 0.6vw, 1.4rem);
+}
+
+.chan-lesson-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.chan-lesson-kicker span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.25rem;
+  min-height: 1.75rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+  background: #e7f4f2;
+  color: var(--teal);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.chan-lesson-kicker strong {
+  color: var(--olive);
+  font-size: 0.9rem;
+}
+
+.chan-lesson-hero h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.9rem);
+  line-height: 1.25;
+}
+
+.chan-lesson-subtitle {
+  margin: -0.3rem 0 0;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.chan-takeaway {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid #bdd8d3;
+  border-radius: 8px;
+  background: #f7fbfa;
+}
+
+.chan-takeaway strong {
+  color: var(--teal);
+}
+
+.chan-takeaway p,
+.chan-body-copy p,
+.chan-study-block p {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.78;
+}
+
+.chan-body-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.chan-lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.chan-study-block {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
+  box-shadow: none;
+}
+
+.chan-study-block.wide {
+  grid-column: 1 / -1;
+  border-color: #bdd8d3;
+  background: #f7fbfa;
+}
+
+.chan-study-block > span {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 26px;
+  border-radius: 6px;
+  background: #e7f4f2;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.chan-study-block h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.chan-study-block ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.chan-study-block li {
+  color: var(--muted);
+  line-height: 1.68;
+}
+
+.chan-definition-list {
+  display: grid;
+}
+
+.chan-definition {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.chan-definition:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.chan-definition:last-child {
+  padding-bottom: 0;
+}
+
+.chan-definition strong {
+  color: var(--teal);
+}
+
+.chan-definition p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.68;
+}
+
+.chan-integration-card {
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 1080px) {
+  .chan-course-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .chan-course-index {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .chan-course-hero,
+  .chan-lesson-grid {
+    grid-template-columns: 1fr;
+  }
+}
