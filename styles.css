@@ -4192,6 +4192,243 @@ h4,
   color: var(--teal);
 }
 
+.chan-visual-card {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #bdd8d3;
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.chan-visual-card figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.chan-visual-card figcaption span {
+  color: var(--teal);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.chan-visual-card figcaption strong {
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+
+.chan-visual-frame {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chan-visual-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+.chan-visual-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: chan-step;
+}
+
+.chan-visual-steps li {
+  position: relative;
+  min-height: 3rem;
+  padding: 9px 10px 9px 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.chan-visual-steps li::before {
+  counter-increment: chan-step;
+  content: counter(chan-step);
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: #e7f4f2;
+  color: var(--teal);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.cv-bg {
+  fill: #fbfcfa;
+}
+
+.cv-axis,
+.cv-level {
+  stroke: #d6e0df;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-price,
+.cv-structure-line {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-structure-line {
+  stroke: #b88117;
+  stroke-width: 3;
+}
+
+.cv-arrow {
+  stroke: #6c7a86;
+  stroke-width: 2.4;
+  marker-end: url(#chanArrow);
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-arrow-head {
+  fill: #6c7a86;
+}
+
+.cv-box rect,
+.cv-band rect,
+.cv-inset {
+  stroke: var(--line);
+  stroke-width: 2;
+  fill: #fff;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-box-muted rect {
+  fill: #f7fbfa;
+}
+
+.cv-box-buy rect {
+  fill: #e7f4f2;
+  stroke: #94c7c0;
+}
+
+.cv-box-sell rect {
+  fill: #fff2ef;
+  stroke: #e7a18d;
+}
+
+.cv-box-wait rect {
+  fill: #f8f3e7;
+  stroke: #dac58a;
+}
+
+.cv-zone {
+  fill: rgba(8, 127, 140, 0.11);
+  stroke: rgba(8, 127, 140, 0.45);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-inset {
+  fill: #fff;
+}
+
+.cv-box-title,
+.cv-label,
+.cv-title {
+  fill: var(--ink);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.cv-title {
+  font-size: 20px;
+}
+
+.cv-box-subtitle,
+.cv-small,
+.cv-note {
+  fill: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.cv-note {
+  font-size: 16px;
+}
+
+.cv-danger {
+  fill: #b94f3a;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.cv-dot-buy,
+.cv-dot-sell {
+  stroke: #fff;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-dot-buy {
+  fill: var(--teal);
+}
+
+.cv-dot-sell {
+  fill: #d95d39;
+}
+
+.cv-hist,
+.cv-hist-muted {
+  rx: 3;
+}
+
+.cv-hist {
+  fill: rgba(8, 127, 140, 0.62);
+}
+
+.cv-hist-muted {
+  fill: rgba(217, 93, 57, 0.48);
+}
+
+.cv-wick {
+  stroke: #43505a;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-candle-up {
+  fill: var(--teal);
+  stroke: #24313a;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.cv-candle-down {
+  fill: #d95d39;
+  stroke: #24313a;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
 .chan-takeaway p,
 .chan-body-copy p,
 .chan-study-block p {
@@ -4302,7 +4539,8 @@ h4,
 
 @media (max-width: 860px) {
   .chan-course-hero,
-  .chan-lesson-grid {
+  .chan-lesson-grid,
+  .chan-visual-steps {
     grid-template-columns: 1fr;
   }
 }

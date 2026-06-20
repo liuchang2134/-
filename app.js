@@ -1156,6 +1156,59 @@ chanTheoryModule.lessons = [
   }
 ];
 
+chanTheoryModule.visuals = {
+  discipline: {
+    type: "discipline",
+    title: "只在买卖点行动",
+    steps: ["先确定操作级别。", "有买点或卖点才执行。", "没有结构信号时，最好的动作是等待。"]
+  },
+  structure: {
+    type: "structure",
+    title: "走势由上、下、盘连接而成",
+    steps: ["先把行情分成几段走势。", "再看每段之间是延伸、盘整还是转折。", "不要从中间随机截一段就下结论。"]
+  },
+  "fractal-stroke": {
+    type: "fractal",
+    title: "分型、笔、线段只是结构零件",
+    steps: ["顶底分型标局部转折。", "笔把有效分型连起来。", "线段再服务中枢和级别判断。"]
+  },
+  center: {
+    type: "center",
+    title: "中枢是反复重叠的平衡区",
+    steps: ["先找三段次级别走势的重叠区。", "离开中枢后看回抽是否进入区间。", "回抽不进中枢，才有三买三卖的意义。"]
+  },
+  timeframe: {
+    type: "timeframe",
+    title: "大级别定方向，小级别找触发",
+    steps: ["周线和日线先给大位置。", "30 分钟定位中枢和背驰段。", "5 分钟只负责精确入场，不负责改大方向。"]
+  },
+  divergence: {
+    type: "divergence",
+    title: "价格创新高，但推进力度变弱",
+    steps: ["先确认趋势结构和背驰段。", "再比较同级别两段推进力度。", "背驰是警报，入场还要等买卖点确认。"]
+  },
+  entries: {
+    type: "entries",
+    title: "一买、二买、三买来自不同结构位置",
+    steps: ["一买偏转折，风险高但位置早。", "二买是第一次回抽确认。", "三买是离开中枢后回抽不进中枢。"]
+  },
+  "small-to-large": {
+    type: "smallToLarge",
+    title: "小级别先转，推动大级别转折",
+    steps: ["大级别看不到标准背驰时，下钻到内部。", "观察小级别中枢和背驰是否完成。", "小转大也需要后续结构确认。"]
+  },
+  "chart-reading": {
+    type: "chartReading",
+    title: "固定看图流程，减少主观解释",
+    steps: ["先看大级别位置。", "再找当前中枢和背驰段。", "最后落到买卖点和失效条件。"]
+  },
+  integration: {
+    type: "integration",
+    title: "缠论定位结构，Brooks 过滤交易质量",
+    steps: ["缠论先回答级别、中枢、背驰和买卖点。", "Brooks 再回答背景、信号、止损和目标。", "两边冲突时等待，不硬做。"]
+  }
+};
+
 const state = {
   lesson: Number(localStorage.getItem("activeLesson") || 0),
   pattern: "breakout",
@@ -1327,6 +1380,7 @@ function renderChanTheory() {
   const activeIndex = lessons.findIndex((lesson) => lesson.id === activeLesson.id);
   const definitionCount = lessons.reduce((sum, lesson) => sum + (lesson.definitions?.length || 0), 0);
   const practiceCount = lessons.filter((lesson) => lesson.practice).length;
+  const visualCount = Object.keys(module.visuals || {}).length;
 
   $("#chanTheoryModule").innerHTML = `
     <article class="chan-layout chan-course searchable" data-search="${html(searchText({ title: module.title, summary: module.summary, lessons, comparison: module.comparison }))}">
@@ -1344,9 +1398,9 @@ function renderChanTheory() {
         <div class="chan-meta-grid">
           ${[
             ["站内课程", `${lessons.length} 章`],
+            ["结构图解", `${visualCount} 张`],
             ["核心定义", `${definitionCount} 个`],
-            ["复盘动作", `${practiceCount} 组`],
-            ["PDF 来源", "205 页"]
+            ["复盘动作", `${practiceCount} 组`]
           ].map(([label, value]) => `
             <div class="chan-meta-card">
               <span>${html(label)}</span>
@@ -1417,6 +1471,7 @@ function renderChanLessonDetail(lesson, index) {
       </div>
       <h3>${html(lesson.title)}</h3>
       <p class="chan-lesson-subtitle">${html(lesson.subtitle)}</p>
+      ${renderChanVisual(lesson)}
       <div class="chan-takeaway">
         <strong>本章抓什么</strong>
         <p>${html(lesson.takeaway)}</p>
@@ -1465,6 +1520,198 @@ function renderChanLessonDetail(lesson, index) {
 
 function renderChanList(items = []) {
   return `<ul>${items.map((item) => `<li>${html(item)}</li>`).join("")}</ul>`;
+}
+
+function renderChanVisual(lesson) {
+  const visual = chanTheoryModule.visuals?.[lesson.id];
+  if (!visual) return "";
+  return `
+    <figure class="chan-visual-card searchable" data-search="${html(searchText(visual))}">
+      <figcaption>
+        <span>结构图解</span>
+        <strong>${html(visual.title)}</strong>
+      </figcaption>
+      <div class="chan-visual-frame">
+        ${chanVisualSvg(visual.type)}
+      </div>
+      <ol class="chan-visual-steps">
+        ${visual.steps.map((step) => `<li>${html(step)}</li>`).join("")}
+      </ol>
+    </figure>
+  `;
+}
+
+function chanVisualSvg(type) {
+  const diagrams = {
+    discipline: `
+      ${cvBox(38, 58, 132, 66, "观察市场", "先不预测", "cv-box-muted")}
+      ${cvBox(210, 58, 132, 66, "确定级别", "周/日/30/5", "")}
+      ${cvBox(382, 28, 132, 66, "出现买点", "按计划买", "cv-box-buy")}
+      ${cvBox(382, 112, 132, 66, "出现卖点", "按计划卖", "cv-box-sell")}
+      ${cvBox(550, 70, 126, 78, "没有点", "等待", "cv-box-wait")}
+      ${cvArrow(170, 91, 210, 91)}
+      ${cvArrow(342, 91, 382, 62)}
+      ${cvArrow(342, 91, 382, 146)}
+      ${cvArrow(514, 62, 550, 91)}
+      ${cvArrow(514, 146, 550, 111)}
+      <text x="350" y="242" class="cv-note">规则不是让你天天交易，而是让你知道什么时候不能交易。</text>
+    `,
+    structure: `
+      <rect x="304" y="88" width="142" height="92" rx="10" class="cv-zone"/>
+      <text x="330" y="116" class="cv-label">盘整 / 中枢</text>
+      <polyline points="46,220 118,166 188,198 260,118 332,154 402,104 472,132 548,78 660,116" class="cv-price"/>
+      <text x="72" y="236" class="cv-small">走势A：上</text>
+      <text x="310" y="204" class="cv-small">走势B：盘</text>
+      <text x="530" y="64" class="cv-small">走势C：上</text>
+      ${cvArrow(186, 206, 254, 132)}
+      ${cvArrow(446, 108, 522, 82)}
+      <text x="84" y="48" class="cv-title">先分走势，再看走势怎么连接</text>
+    `,
+    fractal: `
+      ${cvCandle(76, 170, 132, 118, 184)}
+      ${cvCandle(120, 132, 86, 76, 148)}
+      ${cvCandle(164, 90, 136, 82, 152)}
+      ${cvCandle(236, 154, 200, 144, 214)}
+      ${cvCandle(280, 200, 232, 190, 248)}
+      ${cvCandle(324, 228, 178, 166, 238)}
+      ${cvCandle(430, 172, 112, 100, 184)}
+      ${cvCandle(474, 112, 72, 60, 126)}
+      ${cvCandle(518, 76, 132, 66, 148)}
+      <polyline points="120,76 280,248 474,60" class="cv-structure-line"/>
+      <circle cx="120" cy="76" r="7" class="cv-dot-sell"/><text x="78" y="52" class="cv-label">顶分型</text>
+      <circle cx="280" cy="248" r="7" class="cv-dot-buy"/><text x="236" y="282" class="cv-label">底分型</text>
+      <circle cx="474" cy="60" r="7" class="cv-dot-sell"/><text x="500" y="54" class="cv-label">顶分型</text>
+      <text x="196" y="130" class="cv-note">笔</text>
+      <text x="354" y="124" class="cv-note">线段服务中枢判断</text>
+    `,
+    center: `
+      <rect x="248" y="110" width="206" height="88" rx="8" class="cv-zone"/>
+      <line x1="52" y1="110" x2="660" y2="110" class="cv-level"/>
+      <line x1="52" y1="198" x2="660" y2="198" class="cv-level"/>
+      <text x="286" y="148" class="cv-label">中枢重叠区</text>
+      <polyline points="54,222 132,164 206,212 278,124 350,188 426,118 506,80 576,126 652,86" class="cv-price"/>
+      <circle cx="576" cy="126" r="8" class="cv-dot-buy"/><text x="534" y="156" class="cv-label">三买：回抽不进中枢</text>
+      ${cvArrow(454, 102, 510, 82)}
+      <text x="470" y="70" class="cv-small">离开中枢</text>
+    `,
+    timeframe: `
+      ${cvBand(58, 36, 604, 48, "周线", "大方向：只判断大位置", "#f7fbfa")}
+      ${cvBand(98, 98, 526, 48, "日线", "结构：趋势、盘整、中枢", "#fbfcfd")}
+      ${cvBand(138, 160, 446, 48, "30分钟", "定位：背驰段和回抽", "#f7fbfa")}
+      ${cvBand(178, 222, 366, 48, "5分钟", "触发：信号和止损", "#fbfcfd")}
+      ${cvArrow(360, 84, 360, 98)}
+      ${cvArrow(360, 146, 360, 160)}
+      ${cvArrow(360, 208, 360, 222)}
+      <text x="112" y="304" class="cv-note">从大到小看，不用小级别信号推翻大级别背景。</text>
+    `,
+    divergence: `
+      <polyline points="58,204 138,144 216,174 294,92 368,128 454,64 532,116 646,88" class="cv-price"/>
+      <circle cx="294" cy="92" r="7" class="cv-dot-sell"/><text x="254" y="72" class="cv-label">前高</text>
+      <circle cx="454" cy="64" r="7" class="cv-dot-sell"/><text x="420" y="42" class="cv-label">价格新高</text>
+      <rect x="130" y="246" width="42" height="34" class="cv-hist"/>
+      <rect x="208" y="228" width="42" height="52" class="cv-hist"/>
+      <rect x="286" y="214" width="42" height="66" class="cv-hist"/>
+      <rect x="390" y="238" width="42" height="42" class="cv-hist-muted"/>
+      <rect x="468" y="250" width="42" height="30" class="cv-hist-muted"/>
+      <line x1="118" y1="280" x2="550" y2="280" class="cv-axis"/>
+      <text x="380" y="216" class="cv-danger">力度降低</text>
+      ${cvArrow(454, 76, 494, 122)}
+      <text x="512" y="128" class="cv-note">背驰警报，不等于立刻反向</text>
+    `,
+    entries: `
+      <rect x="282" y="118" width="180" height="78" rx="8" class="cv-zone"/>
+      <text x="318" y="150" class="cv-label">中枢</text>
+      <polyline points="66,82 136,136 206,226 276,164 350,190 430,126 512,84 584,132 656,92" class="cv-price"/>
+      <circle cx="206" cy="226" r="9" class="cv-dot-buy"/><text x="154" y="256" class="cv-label">一买</text>
+      <circle cx="350" cy="190" r="9" class="cv-dot-buy"/><text x="318" y="222" class="cv-label">二买</text>
+      <circle cx="584" cy="132" r="9" class="cv-dot-buy"/><text x="548" y="164" class="cv-label">三买</text>
+      <text x="90" y="46" class="cv-small">背驰转折</text>
+      <text x="300" y="90" class="cv-small">回抽确认</text>
+      <text x="510" y="58" class="cv-small">离开后不回中枢</text>
+    `,
+    smallToLarge: `
+      <polyline points="52,220 128,186 204,154 280,118 356,86 450,64 540,108 650,92" class="cv-price"/>
+      <text x="80" y="244" class="cv-small">大级别：看起来仍在上涨</text>
+      <rect x="390" y="128" width="250" height="138" rx="12" class="cv-inset"/>
+      <text x="412" y="154" class="cv-label">背驰段内部小级别</text>
+      <rect x="484" y="184" width="74" height="36" rx="6" class="cv-zone"/>
+      <polyline points="418,236 462,206 502,222 542,188 586,214 624,176" class="cv-structure-line"/>
+      <circle cx="586" cy="214" r="7" class="cv-dot-buy"/><text x="530" y="250" class="cv-small">小级别先完成</text>
+      ${cvArrow(520, 128, 520, 98)}
+      <text x="480" y="46" class="cv-danger">小转大</text>
+    `,
+    chartReading: `
+      ${cvBox(64, 42, 136, 56, "1 大级别", "位置/方向", "")}
+      ${cvBox(236, 42, 136, 56, "2 当前中枢", "区间在哪", "")}
+      ${cvBox(408, 42, 136, 56, "3 背驰段", "力度对比", "")}
+      ${cvBox(236, 142, 136, 56, "4 买卖点", "触发位置", "cv-box-buy")}
+      ${cvBox(408, 142, 136, 56, "5 失效条件", "错了在哪走", "cv-box-sell")}
+      ${cvBox(278, 238, 164, 54, "最后才下单", "不是先猜后解释", "cv-box-wait")}
+      ${cvArrow(200, 70, 236, 70)}
+      ${cvArrow(372, 70, 408, 70)}
+      ${cvArrow(476, 98, 476, 142)}
+      ${cvArrow(304, 98, 304, 142)}
+      ${cvArrow(304, 198, 334, 238)}
+      ${cvArrow(476, 198, 386, 238)}
+    `,
+    integration: `
+      ${cvBox(58, 48, 190, 72, "缠论定位", "级别 / 中枢 / 背驰 / 买卖点", "")}
+      ${cvBox(472, 48, 190, 72, "Brooks 过滤", "背景 / 信号 / 止损 / 目标", "")}
+      ${cvBox(262, 164, 196, 76, "共同指向", "才进入交易计划", "cv-box-buy")}
+      ${cvArrow(248, 86, 298, 164)}
+      ${cvArrow(472, 86, 422, 164)}
+      <text x="78" y="196" class="cv-note">结构说“位置到了”</text>
+      <text x="482" y="196" class="cv-note">价格行为说“这一笔合格”</text>
+      <text x="274" y="284" class="cv-danger">冲突时：等待 / 降仓 / 放弃</text>
+    `
+  };
+  return chanSvg(diagrams[type] || diagrams.structure);
+}
+
+function chanSvg(content) {
+  return `
+    <svg class="chan-visual-svg" viewBox="0 0 720 320" role="img" aria-label="缠论结构图解">
+      <defs>
+        <marker id="chanArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" class="cv-arrow-head"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="720" height="320" rx="14" class="cv-bg"/>
+      <line x1="36" y1="282" x2="684" y2="282" class="cv-axis"/>
+      ${content}
+    </svg>
+  `;
+}
+
+function cvBox(x, y, width, height, title, subtitle, extraClass = "") {
+  return `
+    <g class="cv-box ${extraClass}">
+      <rect x="${x}" y="${y}" width="${width}" height="${height}" rx="10"/>
+      <text x="${x + width / 2}" y="${y + 26}" class="cv-box-title" text-anchor="middle">${title}</text>
+      <text x="${x + width / 2}" y="${y + 49}" class="cv-box-subtitle" text-anchor="middle">${subtitle}</text>
+    </g>
+  `;
+}
+
+function cvBand(x, y, width, height, title, subtitle, fill) {
+  return `
+    <g class="cv-band">
+      <rect x="${x}" y="${y}" width="${width}" height="${height}" rx="10" fill="${fill}"/>
+      <text x="${x + 24}" y="${y + 30}" class="cv-box-title">${title}</text>
+      <text x="${x + 120}" y="${y + 30}" class="cv-box-subtitle">${subtitle}</text>
+    </g>
+  `;
+}
+
+function cvArrow(x1, y1, x2, y2) {
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="cv-arrow"/>`;
+}
+
+function cvCandle(x, open, close, low, high) {
+  const top = Math.min(open, close);
+  const height = Math.max(8, Math.abs(close - open));
+  const cls = close < open ? "cv-candle-up" : "cv-candle-down";
+  return `<line x1="${x}" y1="${low}" x2="${x}" y2="${high}" class="cv-wick"/><rect x="${x - 10}" y="${top}" width="20" height="${height}" rx="2" class="${cls}"/>`;
 }
 
 function renderLessonList() {
