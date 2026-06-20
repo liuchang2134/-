@@ -3596,6 +3596,7 @@ body {
 }
 
 #core-theory .section-heading,
+#chan-theory .section-heading,
 #video-library .section-heading,
 #materials .section-heading,
 #glossary .section-heading {
@@ -3835,6 +3836,212 @@ h4,
   }
 
   .primary-encyclopedia .encyclopedia-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Chan theory supplement: a secondary structure module, not the main Brooks workspace. */
+.chan-section {
+  scroll-margin-top: 84px;
+}
+
+.chan-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.chan-hero,
+.chan-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.chan-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr);
+  gap: clamp(1rem, 0.55rem + 1vw, 1.5rem);
+  align-items: stretch;
+  padding: clamp(1rem, 0.62rem + 1vw, 1.5rem);
+  border-color: #cfdbc7;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbf4 100%);
+}
+
+.chan-hero h3 {
+  margin-bottom: 0.25rem;
+  font-size: clamp(1.45rem, 1.08rem + 0.95vw, 2.15rem);
+}
+
+.chan-hero p {
+  color: var(--muted);
+}
+
+.chan-subtitle {
+  margin-bottom: 1rem;
+  color: var(--olive) !important;
+  font-weight: 900;
+}
+
+.chan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.chan-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.chan-meta-card {
+  display: grid;
+  align-content: center;
+  gap: 0.35rem;
+  min-height: 7rem;
+  padding: 1rem;
+  border: 1px solid #d9e4d0;
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.chan-meta-card span,
+.chan-card .panel-heading span,
+.chan-concept-card span,
+.chan-path-row span {
+  color: var(--olive);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.chan-meta-card strong {
+  color: var(--ink);
+  font-size: clamp(1rem, 0.88rem + 0.35vw, 1.22rem);
+  line-height: 1.35;
+}
+
+.chan-card {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 0.62rem + 1vw, 1.5rem);
+  box-shadow: none;
+}
+
+.chan-concept-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.chan-concept-card {
+  display: grid;
+  gap: 0.55rem;
+  min-height: 13rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.chan-concept-card span,
+.chan-path-row span {
+  display: inline-grid;
+  place-items: center;
+  width: max-content;
+  min-width: 2rem;
+  min-height: 1.65rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: #eef4e7;
+}
+
+.chan-concept-card h4 {
+  margin: 0;
+}
+
+.chan-concept-card p,
+.chan-path-row p,
+.chan-compare-row p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.chan-path {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.chan-path-row {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(8rem, 0.24fr) minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: start;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.chan-path-row:first-child {
+  border-top: 0;
+}
+
+.chan-path-row strong {
+  color: var(--ink);
+}
+
+.chan-compare-table {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.chan-compare-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.chan-compare-row:first-child {
+  border-top: 0;
+}
+
+.chan-compare-row strong,
+.chan-compare-row p {
+  padding: 0.85rem 1rem;
+}
+
+.chan-compare-row strong {
+  background: #f4f8ee;
+  color: var(--ink);
+}
+
+.chan-compare-row p + p {
+  border-left: 1px solid var(--line);
+}
+
+.academy-route-grid {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+@media (max-width: 980px) {
+  .chan-hero,
+  .chan-concept-grid,
+  .chan-compare-row {
+    grid-template-columns: 1fr;
+  }
+
+  .chan-compare-row p + p {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 720px) {
+  .chan-meta-grid,
+  .chan-path-row {
     grid-template-columns: 1fr;
   }
 }

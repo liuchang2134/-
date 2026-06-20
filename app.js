@@ -883,6 +883,59 @@ const exampleAtlas = [
   }
 ];
 
+const chanTheoryModule = {
+  title: "缠中说禅技术解析",
+  subtitle: "市场结构分类学 · 零师独家讲解版",
+  file: "materials/缠中说禅（0师）+.pdf",
+  meta: [
+    ["页数", "205 页"],
+    ["定位", "中文结构分析补充"],
+    ["核心", "走势 / 级别 / 中枢 / 背驰"],
+    ["用法", "辅助理解结构，不替代 Brooks 图表百科"]
+  ],
+  summary: "这份资料的主线不是寻找单个神奇形态，而是把市场拆成可以递归观察的结构：先确定走势和级别，再观察中枢如何生成、扩展或终结，最后用背驰和三类买卖点定位交易窗口。它适合作为 Brooks 体系之外的中文结构语言补充：Brooks 更强调当前 K 线、背景、概率和交易管理；缠论更强调走势分解、级别联立和结构完成度。两者放在一起学时，重点不是混成一套新术语，而是用缠论训练“结构分层”，再用 Brooks 检查“当下能不能交易”。",
+  concepts: [
+    {
+      title: "走势与走势必完美",
+      text: "资料把走势看成由不同级别结构递归组成的过程。不要只看一段上涨或下跌，而要问：这段走势属于哪个级别，是否已经完成至少一个可识别结构，后面是延伸、扩展还是转折。"
+    },
+    {
+      title: "级别",
+      text: "级别是整套资料的过滤器。大级别决定方向和交易空间，小级别负责精确入场。模块里建议把周、日、30 分钟、5 分钟联动看，而不是在单一周期里硬找所有答案。"
+    },
+    {
+      title: "中枢",
+      text: "中枢是价格反复重叠、市场暂时达成平衡的结构区域。理解中枢的生成、扩展和离开，等于理解行情是在盘整、趋势延续，还是准备进入更大级别的变化。"
+    },
+    {
+      title: "背驰",
+      text: "背驰不是单纯看指标背离。资料反复强调结构先到位，再看力度衰竭。结构不到位时，MACD 只能辅助；结构到位后，背驰才有交易意义。"
+    },
+    {
+      title: "三类买卖点",
+      text: "一买/一卖偏向背驰后的转折，二买/二卖偏向第一次转折后的确认，三买/三卖偏向离开中枢后的回抽确认。它们本质上是不同结构位置的交易窗口。"
+    },
+    {
+      title: "看和干",
+      text: "资料里的操作观念很直接：市场不是用来幻想的，而是结构出现什么就做什么。买点买、卖点卖，其他基本面和喜好只作为背景，不作为替代规则。"
+    }
+  ],
+  readingPath: [
+    ["01", "先读总纲", "理解它反复强调的操作观：不要迷信庄家、基本面和喜好，先建立买卖点纪律。"],
+    ["02", "再读基础理论", "重点看“如何学习、分型、笔、线段、走势必完美、中枢、级别、K线重叠”。"],
+    ["03", "只抓结构词", "每读一段都归类：这是走势、级别、中枢、背驰、买卖点，还是纯理念。"],
+    ["04", "和 Brooks 交叉", "缠论负责结构层级，Brooks 负责当下价格行为、信号质量、止损和风险收益。"],
+    ["05", "回图表复盘", "不要停在概念。拿同一张图同时标 Brooks 背景和缠论中枢，看两套语言是否指向同一交易。"]
+  ],
+  comparison: [
+    ["市场背景", "Brooks：趋势、通道、交易区间、Always In", "缠论：走势类型、级别、中枢位置"],
+    ["关键位置", "Brooks：支撑阻力、磁力位、前高低、均线", "缠论：中枢区间、三买三卖、背驰段"],
+    ["入场触发", "Brooks：信号 K、入场 K、突破跟随、失败突破", "缠论：一二三类买卖点和结构确认"],
+    ["风险管理", "Brooks：止损、测量移动、交易者方程", "缠论：级别错配、背驰失败、中枢扩展"],
+    ["学习提醒", "Brooks：不要离开背景谈形态", "缠论：不要离开级别谈买卖点"]
+  ]
+};
+
 const state = {
   lesson: Number(localStorage.getItem("activeLesson") || 0),
   pattern: "breakout",
@@ -910,6 +963,7 @@ function init() {
   renderEncyclopediaFilters();
   renderEncyclopedia();
   renderCoreTheory();
+  renderChanTheory();
   renderVideoFilters();
   renderVideoLibrary();
   renderMaterials();
@@ -1029,7 +1083,8 @@ function renderHome() {
     ["01", "查图表百科", "按胜率、重要性、类别和关键词快速定位形态。", "#encyclopedia"],
     ["02", "看 AB 原图", "每个形态先看原始图表和中文标注，别先背概念。", "#encyclopedia"],
     ["03", "读视频讲解", "用 Brooks 课程总结解释这张图为什么成立或失败。", "#video-library"],
-    ["04", "补系统课程", "不懂市场背景时，再回课程路径补框架。", "#course"]
+    ["04", "补系统课程", "不懂市场背景时，再回课程路径补框架。", "#course"],
+    ["05", "看缠论补充", "用走势、级别、中枢和背驰补充中文结构视角。", "#chan-theory"]
   ].map(([step, title, text, href]) => `
     <a class="route-card searchable" href="${href}" data-search="${html(`${step} ${title} ${text}`)}">
       <span>${step}</span>
@@ -1038,6 +1093,82 @@ function renderHome() {
     </a>
   `).join("");
 
+}
+
+function renderChanTheory() {
+  const module = chanTheoryModule;
+  $("#chanTheoryModule").innerHTML = `
+    <article class="chan-layout searchable" data-search="${html(searchText(module))}">
+      <section class="chan-hero">
+        <div>
+          <p class="eyebrow">PDF Supplement</p>
+          <h3>${html(module.title)}</h3>
+          <p class="chan-subtitle">${html(module.subtitle)}</p>
+          <p>${html(module.summary)}</p>
+          <div class="chan-actions">
+            <a class="primary-button" href="${html(module.file)}" target="_blank" rel="noreferrer">打开 PDF 原文</a>
+            <a class="secondary-button" href="#encyclopedia">回到 Brooks 图表百科</a>
+          </div>
+        </div>
+        <div class="chan-meta-grid">
+          ${module.meta.map(([label, value]) => `
+            <div class="chan-meta-card">
+              <span>${html(label)}</span>
+              <strong>${html(value)}</strong>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="chan-card">
+        <div class="panel-heading">
+          <h3>这份资料讲什么</h3>
+          <span>结构优先</span>
+        </div>
+        <div class="chan-concept-grid">
+          ${module.concepts.map((concept, index) => `
+            <article class="chan-concept-card">
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h4>${html(concept.title)}</h4>
+              <p>${html(concept.text)}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="chan-card">
+        <div class="panel-heading">
+          <h3>怎么放进本网站学习</h3>
+          <span>不要混乱术语</span>
+        </div>
+        <div class="chan-path">
+          ${module.readingPath.map(([step, title, text]) => `
+            <div class="chan-path-row">
+              <span>${step}</span>
+              <strong>${html(title)}</strong>
+              <p>${html(text)}</p>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="chan-card">
+        <div class="panel-heading">
+          <h3>和 Brooks 怎么对照</h3>
+          <span>一张图两套语言</span>
+        </div>
+        <div class="chan-compare-table">
+          ${module.comparison.map(([topic, brooks, chan]) => `
+            <div class="chan-compare-row">
+              <strong>${html(topic)}</strong>
+              <p>${html(brooks)}</p>
+              <p>${html(chan)}</p>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    </article>
+  `;
 }
 
 function renderLessonList() {
@@ -2465,8 +2596,8 @@ function html(value) {
 }
 
 function searchText(value) {
-  if (Array.isArray(value)) return value.join(" ");
-  if (typeof value === "object" && value) return Object.values(value).flat(2).join(" ");
+  if (Array.isArray(value)) return value.map((item) => searchText(item)).join(" ");
+  if (typeof value === "object" && value) return Object.values(value).map((item) => searchText(item)).join(" ");
   return String(value || "");
 }
 
