@@ -2627,8 +2627,18 @@ function renderAnnotatedChartFigure(pattern, chart, index, videoInsight) {
   const rawSrc = chart.src || "";
   const annotatedSrc = annotatedChartSrc(chart);
   const lesson = chartTeachingNote(pattern, chart, index, videoInsight);
+  const lessonSearch = [
+    pattern.title,
+    lesson.badge,
+    lesson.title,
+    lesson.summary,
+    lesson.subtitleNote,
+    lesson.sections.map((section) => `${section.label} ${section.text}`).join(" "),
+    chart.caption || "",
+    chart.source || ""
+  ].join(" ");
   return `
-    <figure class="annotated-figure searchable" data-search="${html(`${pattern.title} ${lesson.title} ${lesson.summary} ${lesson.points.join(" ")} ${chart.caption || ""}`)}">
+    <figure class="annotated-figure searchable" data-search="${html(lessonSearch)}">
       <div class="annotated-chart">
         <a href="${html(annotatedSrc)}" target="_blank" rel="noreferrer">
           <img src="${html(annotatedSrc)}" alt="${html(pattern.title)} AB 原图中文标注 ${index + 1}" ${index > 1 ? 'loading="lazy"' : ""} onerror="this.onerror=null;this.src='${html(rawSrc)}';" />
@@ -2642,11 +2652,23 @@ function renderAnnotatedChartFigure(pattern, chart, index, videoInsight) {
       <div class="chart-lesson-card">
         <div class="chart-lesson-head">
           <span>${html(lesson.badge)}</span>
-          <strong>${html(lesson.title)}</strong>
+          <div>
+            <strong>${html(lesson.title)}</strong>
+            <em>${html(lesson.courseLine)}</em>
+          </div>
         </div>
-        <p>${html(lesson.summary)}</p>
-        <div class="chart-lesson-points">
-          ${lesson.points.map((point) => `<p>${html(point)}</p>`).join("")}
+        <p class="chart-lesson-summary">${html(lesson.summary)}</p>
+        <div class="chart-subtitle-note">
+          <span>字幕课提炼</span>
+          <p>${html(lesson.subtitleNote)}</p>
+        </div>
+        <div class="chart-lesson-sections">
+          ${lesson.sections.map((section) => `
+            <section>
+              <span>${html(section.label)}</span>
+              <p>${html(section.text)}</p>
+            </section>
+          `).join("")}
         </div>
         <small>${html(lesson.source)}</small>
       </div>
@@ -2658,56 +2680,102 @@ function chartTeachingNote(pattern, chart, index, videoInsight) {
   const lens = chartLessonLens(index);
   const family = chartFamilyPrinciple(pattern.family);
   const related = videoInsight?.related || [];
-  const relatedLesson = related.length ? related[index % related.length] : null;
-  const relatedBullet = relatedLesson?.bullets?.length ? relatedLesson.bullets[index % relatedLesson.bullets.length] : "";
+  const relatedLesson = selectChartRelatedLesson(related, index);
+  const subtitleBullets = chartSubtitleBullets(relatedLesson, videoInsight, index);
+  const courseLine = relatedLesson
+    ? `${relatedLesson.title} · ${relatedLesson.language || "课程"} · ${formatDuration(relatedLesson.minutesEstimate || 0)} · ${formatNumber(relatedLesson.cueCount || 0)} 条字幕`
+    : `综合 ${formatNumber(videoInsight?.relatedCount || 0)} 个相关 AB 核心课`;
   const source = relatedLesson
-    ? `相关视频课摘要：${relatedLesson.title}；本图来自图表百科 p.${chart.page}。`
+    ? `说明依据：字幕课 ${relatedLesson.title}，并结合图表百科 ${chart.source} p.${chart.page}。`
     : `课程来源：${pattern.source}；本图来自图表百科 p.${chart.page}。`;
+  const subtitleNote = subtitleDrivenChartExplanation(pattern, relatedLesson, subtitleBullets, family);
 
   return {
     badge: `样本 ${index + 1} · ${lens.badge}`,
-    title: lens.title(pattern, family),
-    summary: lens.summary(pattern, family, index),
-    points: uniqueOrdered([
-      lens.point(pattern, family),
-      family.point(pattern, index),
-      relatedBullet ? `视频课联想：${relatedBullet}` : family.fallback(pattern)
-    ]).slice(0, 3),
+    title: lens.title(pattern, family, relatedLesson),
+    courseLine,
+    summary: lens.summary(pattern, family, relatedLesson),
+    subtitleNote,
+    sections: lens.sections(pattern, family, subtitleBullets),
     source
   };
+}
+
+function selectChartRelatedLesson(related, index) {
+  if (!related?.length) return null;
+  const chinese = related.filter((lesson) => lesson.language === "中文");
+  const pool = chinese.length ? chinese : related;
+  return pool[index % pool.length] || related[index % related.length] || null;
+}
+
+function chartSubtitleBullets(lesson, videoInsight, index) {
+  const bullets = uniqueOrdered([
+    ...(lesson?.bullets || []),
+    ...(videoInsight?.bullets || [])
+  ]).map(cleanBriefItem).filter(Boolean);
+  if (!bullets.length) return [];
+  const offset = index % bullets.length;
+  return [...bullets.slice(offset), ...bullets.slice(0, offset)].slice(0, 4);
+}
+
+function subtitleDrivenChartExplanation(pattern, lesson, bullets, family) {
+  const lessonAngle = lesson ? lessonTitleAngle(lesson) : family.core;
+  const lessonSummary = lesson?.summary ? cleanBriefItem(lesson.summary) : family.fallback(pattern);
+  const bulletText = bullets.slice(0, 3).join("；");
+  return `${lessonAngle}。放到这张 ${pattern.title} 图里，要把英文标注翻译成交易逻辑：先确认 ${firstPaText(pattern.best)}，再等 ${firstPaText(pattern.entry)}，入场后用 ${firstPaText(pattern.stop)} 控制风险，并且只把 ${firstPaText(pattern.target)} 当作第一目标。${lessonSummary}${bulletText ? ` 字幕里反复提醒的可执行点是：${bulletText}。` : ""}`;
 }
 
 function chartLessonLens(index) {
   const lenses = [
     {
       badge: "背景",
-      title: () => "先判断形态是否出现在高质量位置",
-      summary: (pattern, family) => `Brooks 讲形态时通常先问市场环境，而不是先问名字。这张图适合练习：左侧是否已经给出 ${firstPaText(pattern.best)}，以及这个位置是否真的让 ${pattern.title} 的概率变高。`,
-      point: (pattern) => `读图动作：遮住右半边，只看入场前的背景；如果只剩形态名称而没有位置优势，这笔交易就不该升级。`
+      title: () => "这张图先看市场背景，不先背形态名",
+      summary: (pattern, family) => `Brooks 看这种图的第一步，是把它放回市场周期：现在是趋势、通道还是交易区间。${family.core} 这张样本要练的是左侧结构有没有给出 ${firstPaText(pattern.best)}，如果没有，后面的信号再漂亮也只是低质量机会。`,
+      sections: (pattern, family, bullets) => [
+        { label: "先看背景", text: `遮住右半边，只看入场前：有没有关键高低点、趋势线、均线或区间边缘在起作用。对 ${pattern.title} 来说，背景句就是 ${firstPaText(pattern.best)}。` },
+        { label: "再看优势", text: `${family.point(pattern)} 图里如果只是中间位置的随机波动，不要把它升级成高胜率形态。` },
+        { label: "别误读", text: bullets[0] ? `字幕提醒：${bullets[0]}。所以这张图不是让你看到名字就下单，而是先判断市场有没有给这笔交易足够偏向。` : "如果看不出哪一方在控制，先按观望处理。" }
+      ]
     },
     {
       badge: "触发",
-      title: (pattern) => `看信号K之后有没有真正触发`,
-      summary: (pattern) => `Brooks 不会因为“看起来像”就交易，他要看到信号K和入场K。此图重点是把 ${firstPaText(pattern.entry)} 和后续跟随连起来看，而不是孤立地看一根漂亮K线。`,
-      point: (pattern) => `读图动作：找到信号K、入场K和入场后第一两根K；如果入场后没有跟随，就把预期从波段降到小目标或直接放弃。`
+      title: () => "这张图重点看信号K后有没有跟随",
+      summary: (pattern) => `Brooks 不会因为“看起来像”就交易，他要看到信号K、入场K和入场后的跟随。此图重点是把 ${firstPaText(pattern.entry)} 与后面一两根K连起来看：触发后如果没有推进，原本的波段预期就要降级。`,
+      sections: (pattern, family, bullets) => [
+        { label: "触发位置", text: `先找到图中真正的信号K，不要把左侧任意一根大K都当入场理由。有效触发要接近这条规则：${firstPaText(pattern.entry)}。` },
+        { label: "跟随确认", text: `${family.core} Brooks 真正在意的是触发后是否继续朝形态方向收盘；没有跟随，说明另一方并没有被迫止损。` },
+        { label: "处理方式", text: bullets[1] ? `结合字幕：${bullets[1]}。实战里，触发后两三根K还没有利润，就不要继续幻想大波段。` : "入场后没有立刻顺势，就把目标缩小，或者等下一次更清楚的信号。" }
+      ]
     },
     {
       badge: "管理",
-      title: () => "把止损和目标放回同一张图里看",
-      summary: (pattern) => `这张图下面不再只背“止损、目标”，而是看交易者方程：止损若在 ${firstPaText(pattern.stop)}，目标至少要能看到 ${firstPaText(pattern.target)}，否则方向看对也可能不是好交易。`,
-      point: () => "读图动作：先量入场点到止损，再量入场点到最近磁力位；如果目标太近，Brooks 通常会降低仓位、等更好价格，或不交易。"
+      title: () => "这张图用来量风险收益，不是只看方向",
+      summary: (pattern) => `方向看对不等于交易值得做。Brooks 会把入场、止损和目标放在同一张图里量：止损如果要放在 ${firstPaText(pattern.stop)}，目标至少要合理看到 ${firstPaText(pattern.target)}，否则这张图只能说明方向，不能说明交易质量。`,
+      sections: (pattern, family, bullets) => [
+        { label: "先量风险", text: `从触发价到 ${firstPaText(pattern.stop)} 是真实风险，不是心理上愿意亏多少。风险太大时，Brooks 通常会等回调、缩小仓位或放弃。` },
+        { label: "再量目标", text: `目标先看 ${firstPaText(pattern.target)}。如果最近磁力位太近，哪怕形态方向正确，也可能只是一个小头寸或不值得做的交易。` },
+        { label: "管理重点", text: bullets[2] ? `字幕提醒：${bullets[2]}。这句话落到图上，就是入场后要根据跟随强弱调整波段、剥头皮或退出。` : "入场后如果不能快速脱离入场价，就别把小概率行情当成主计划。" }
+      ]
     },
     {
       badge: "陷阱",
-      title: (pattern) => `这张图用来识别 ${pattern.title} 的失效点`,
-      summary: (pattern) => `Brooks 很重视失败形态，因为被套交易者会制造反向燃料。这里要练的是：什么情况下 ${pattern.title} 不再成立，尤其是 ${firstPaText(pattern.traps)}。`,
-      point: () => "读图动作：不要只标出理想入场，也要标出哪一根K之后你的交易理由消失；理由消失时，不要用希望代替规则。"
+      title: (pattern) => `这张图重点看 ${pattern.title} 什么时候不成立`,
+      summary: (pattern) => `Brooks 很重视失败形态，因为被困交易者会变成反向燃料。这里要练的不是“哪里入场”，而是哪一根K之后 ${pattern.title} 的前提消失，尤其是 ${firstPaText(pattern.traps)}。`,
+      sections: (pattern, family, bullets) => [
+        { label: "失败条件", text: `先在图上标出你的交易理由：背景、触发、跟随。只要其中关键一环被破坏，就按 ${firstPaText(pattern.traps)} 处理，而不是继续找理由。` },
+        { label: "反向燃料", text: `形态失败后，原方向交易者的止损会推动反向运动。${family.fallback(pattern)}` },
+        { label: "复盘句", text: bullets[0] ? `字幕提醒：${bullets[0]}。复盘时写清楚“如果下一根K怎样，我就错了”，这样才不会被图里的标注牵着走。` : "不要只标理想入场，也要标清楚失效点。" }
+      ]
     },
     {
       badge: "复盘",
-      title: () => "用这张图复盘 Brooks 的读图顺序",
-      summary: (pattern, family) => `这张图适合做完整复盘：先定市场周期，再看位置，等触发，最后看风险收益。${family.core} 这个顺序比单独记住 ${pattern.title} 更重要。`,
-      point: () => "读图动作：用一句话写下“为什么现在多头或空头更有优势”；写不出来，就说明图还没有读清楚。"
+      title: () => "这张图适合按 Brooks 顺序完整复盘",
+      summary: (pattern, family) => `这张样本用来把整套读图顺序跑一遍：市场周期、位置、触发、跟随、风险收益、失效条件。${family.core} 如果你只能说出形态名字，却说不出哪一方为什么有优势，说明图还没有读懂。`,
+      sections: (pattern, family, bullets) => [
+        { label: "一句话定性", text: `先写一句：“这是一笔 ${pattern.family} 类交易，因为 ${firstPaText(pattern.best)}。”写不出来时，不要急着看入场。` },
+        { label: "执行顺序", text: `再按 ${firstPaText(pattern.entry)}、${firstPaText(pattern.stop)}、${firstPaText(pattern.target)} 检查交易者方程。顺序错了，就容易把事后走势当成入场理由。` },
+        { label: "字幕落点", text: bullets.length ? `相关字幕里最适合放到这张图上的提醒是：${bullets.slice(0, 2).join("；")}。` : "把图当成训练材料：只要背景、触发、跟随或风险收益缺一项，就把它降级。" }
+      ]
     }
   ];
   return lenses[index % lenses.length];
