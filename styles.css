@@ -4245,7 +4245,8 @@ h4,
 .chan-pdf-image-link img {
   display: block;
   width: 100%;
-  height: min(70vh, 760px);
+  height: auto;
+  max-height: min(70vh, 760px);
   object-fit: contain;
   background: #f7f9fb;
 }
