@@ -4202,6 +4202,17 @@ h4,
   background: #fbfcfd;
 }
 
+.chan-pdf-card {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #d7e1dc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chan-pdf-card figcaption,
 .chan-visual-card figcaption {
   display: flex;
   flex-wrap: wrap;
@@ -4210,15 +4221,66 @@ h4,
   justify-content: space-between;
 }
 
+.chan-pdf-card figcaption span,
 .chan-visual-card figcaption span {
   color: var(--teal);
   font-size: 0.8rem;
   font-weight: 900;
 }
 
+.chan-pdf-card figcaption strong,
 .chan-visual-card figcaption strong {
   color: var(--ink);
   font-size: 1.02rem;
+}
+
+.chan-pdf-image-link {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.chan-pdf-image-link img {
+  display: block;
+  width: 100%;
+  height: min(70vh, 760px);
+  object-fit: contain;
+  background: #f7f9fb;
+}
+
+.chan-pdf-note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.chan-pdf-note p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.chan-pdf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.chan-pdf-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.05rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #bdd8d3;
+  border-radius: 999px;
+  background: #f7fbfa;
+  color: var(--teal);
+  font-size: 0.8rem;
+  font-weight: 900;
 }
 
 .chan-visual-frame {
@@ -4542,5 +4604,18 @@ h4,
   .chan-lesson-grid,
   .chan-visual-steps {
     grid-template-columns: 1fr;
+  }
+
+  .chan-pdf-note {
+    grid-template-columns: 1fr;
+  }
+
+  .chan-pdf-actions {
+    justify-content: flex-start;
+  }
+
+  .chan-pdf-image-link img {
+    height: auto;
+    max-height: none;
   }
 }

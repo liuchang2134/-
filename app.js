@@ -1160,51 +1160,111 @@ chanTheoryModule.visuals = {
   discipline: {
     type: "discipline",
     title: "只在买卖点行动",
+    pdf: {
+      page: 119,
+      image: "assets/chan-pdf/chan-pdf-p119.webp",
+      title: "PDF 原图：买卖点和走势起始/延伸",
+      note: "这一页把买点、卖点和走势起始点/延伸点放在一起讲，适合放在交易纪律章作为原文依据。"
+    },
     steps: ["先确定操作级别。", "有买点或卖点才执行。", "没有结构信号时，最好的动作是等待。"]
   },
   structure: {
     type: "structure",
     title: "走势由上、下、盘连接而成",
+    pdf: {
+      page: 205,
+      image: "assets/chan-pdf/chan-pdf-p205.webp",
+      title: "PDF 原图：走势段和力度对比",
+      note: "手绘图展示了走势段之间的连接和对比，适合先建立“上、下、盘”连接感。"
+    },
     steps: ["先把行情分成几段走势。", "再看每段之间是延伸、盘整还是转折。", "不要从中间随机截一段就下结论。"]
   },
   "fractal-stroke": {
     type: "fractal",
     title: "分型、笔、线段只是结构零件",
+    pdf: {
+      page: 99,
+      image: "assets/chan-pdf/chan-pdf-p099.webp",
+      title: "PDF 原图：线段、级别和区间套",
+      note: "这一页同时出现了多级别图和线段标注，适合理解笔线段为什么必须服务级别。"
+    },
     steps: ["顶底分型标局部转折。", "笔把有效分型连起来。", "线段再服务中枢和级别判断。"]
   },
   center: {
     type: "center",
     title: "中枢是反复重叠的平衡区",
+    pdf: {
+      page: 40,
+      image: "assets/chan-pdf/chan-pdf-p040.webp",
+      title: "PDF 原图：K线重叠与中枢识别",
+      note: "这一页用图说明 K 线重叠和中枢级别的关系，适合放在中枢章。"
+    },
     steps: ["先找三段次级别走势的重叠区。", "离开中枢后看回抽是否进入区间。", "回抽不进中枢，才有三买三卖的意义。"]
   },
   timeframe: {
     type: "timeframe",
     title: "大级别定方向，小级别找触发",
+    pdf: {
+      page: 70,
+      image: "assets/chan-pdf/chan-pdf-p070.webp",
+      title: "PDF 原图：级别和图形周期",
+      note: "这一页直接讲级别不等于时间周期，并用多张图辅助理解。"
+    },
     steps: ["周线和日线先给大位置。", "30 分钟定位中枢和背驰段。", "5 分钟只负责精确入场，不负责改大方向。"]
   },
   divergence: {
     type: "divergence",
     title: "价格创新高，但推进力度变弱",
+    pdf: {
+      page: 26,
+      image: "assets/chan-pdf/chan-pdf-p026.webp",
+      title: "PDF 原图：中枢后走势和背驰判断",
+      note: "这一页结合图表和高亮文字讲中枢后走势，对理解背驰前提很有用。"
+    },
     steps: ["先确认趋势结构和背驰段。", "再比较同级别两段推进力度。", "背驰是警报，入场还要等买卖点确认。"]
   },
   entries: {
     type: "entries",
     title: "一买、二买、三买来自不同结构位置",
+    pdf: {
+      page: 14,
+      image: "assets/chan-pdf/chan-pdf-p014.webp",
+      title: "PDF 原图：二买和次级别一买",
+      note: "这一页有实际图例，直接对应“大级别二买由次级别一买构成”的讲法。"
+    },
     steps: ["一买偏转折，风险高但位置早。", "二买是第一次回抽确认。", "三买是离开中枢后回抽不进中枢。"]
   },
   "small-to-large": {
     type: "smallToLarge",
     title: "小级别先转，推动大级别转折",
+    pdf: {
+      page: 91,
+      image: "assets/chan-pdf/chan-pdf-p091.webp",
+      title: "PDF 原图：小转大的经典例子",
+      note: "这一页原文直接讲“小转大”：先构筑次级别中枢，再用 3 卖确认。"
+    },
     steps: ["大级别看不到标准背驰时，下钻到内部。", "观察小级别中枢和背驰是否完成。", "小转大也需要后续结构确认。"]
   },
   "chart-reading": {
     type: "chartReading",
     title: "固定看图流程，减少主观解释",
+    pdf: {
+      page: 189,
+      image: "assets/chan-pdf/chan-pdf-p189.webp",
+      title: "PDF 原图：同一走势的两种分析",
+      note: "这一页适合练习看图流程：先不要急着命名，先看结构是否完整。"
+    },
     steps: ["先看大级别位置。", "再找当前中枢和背驰段。", "最后落到买卖点和失效条件。"]
   },
   integration: {
     type: "integration",
     title: "缠论定位结构，Brooks 过滤交易质量",
+    pdf: {
+      page: 183,
+      image: "assets/chan-pdf/chan-pdf-p183.webp",
+      title: "PDF 原图：扩展中枢和走势定位",
+      note: "这一页展示扩展中枢画法，适合和 Brooks 的交易区间/突破失败一起对照。"
+    },
     steps: ["缠论先回答级别、中枢、背驰和买卖点。", "Brooks 再回答背景、信号、止损和目标。", "两边冲突时等待，不硬做。"]
   }
 };
@@ -1381,6 +1441,7 @@ function renderChanTheory() {
   const definitionCount = lessons.reduce((sum, lesson) => sum + (lesson.definitions?.length || 0), 0);
   const practiceCount = lessons.filter((lesson) => lesson.practice).length;
   const visualCount = Object.keys(module.visuals || {}).length;
+  const pdfFigureCount = Object.values(module.visuals || {}).filter((visual) => visual.pdf).length;
 
   $("#chanTheoryModule").innerHTML = `
     <article class="chan-layout chan-course searchable" data-search="${html(searchText({ title: module.title, summary: module.summary, lessons, comparison: module.comparison }))}">
@@ -1398,6 +1459,7 @@ function renderChanTheory() {
         <div class="chan-meta-grid">
           ${[
             ["站内课程", `${lessons.length} 章`],
+            ["PDF截图", `${pdfFigureCount} 张`],
             ["结构图解", `${visualCount} 张`],
             ["核心定义", `${definitionCount} 个`],
             ["复盘动作", `${practiceCount} 组`]
@@ -1471,6 +1533,7 @@ function renderChanLessonDetail(lesson, index) {
       </div>
       <h3>${html(lesson.title)}</h3>
       <p class="chan-lesson-subtitle">${html(lesson.subtitle)}</p>
+      ${renderChanPdfFigure(lesson)}
       ${renderChanVisual(lesson)}
       <div class="chan-takeaway">
         <strong>本章抓什么</strong>
@@ -1520,6 +1583,30 @@ function renderChanLessonDetail(lesson, index) {
 
 function renderChanList(items = []) {
   return `<ul>${items.map((item) => `<li>${html(item)}</li>`).join("")}</ul>`;
+}
+
+function renderChanPdfFigure(lesson) {
+  const pdf = chanTheoryModule.visuals?.[lesson.id]?.pdf;
+  if (!pdf) return "";
+  const pdfUrl = `${chanTheoryModule.file}#page=${pdf.page}`;
+  return `
+    <figure class="chan-pdf-card searchable" data-search="${html(searchText(pdf))}">
+      <figcaption>
+        <span>PDF 原图截图 · 第 ${html(pdf.page)} 页</span>
+        <strong>${html(pdf.title)}</strong>
+      </figcaption>
+      <a class="chan-pdf-image-link" href="${html(pdf.image)}" target="_blank" rel="noreferrer" aria-label="放大查看 ${html(pdf.title)}">
+        <img src="${html(pdf.image)}" alt="${html(pdf.title)}" loading="lazy" />
+      </a>
+      <div class="chan-pdf-note">
+        <p>${html(pdf.note)}</p>
+        <div class="chan-pdf-actions">
+          <a href="${html(pdfUrl)}" target="_blank" rel="noreferrer">打开 PDF 第 ${html(pdf.page)} 页</a>
+          <a href="${html(pdf.image)}" target="_blank" rel="noreferrer">放大截图</a>
+        </div>
+      </div>
+    </figure>
+  `;
 }
 
 function renderChanVisual(lesson) {
