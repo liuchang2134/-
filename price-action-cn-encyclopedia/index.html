@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>价格行为图表百科 | Karthus.Liu</title>
+    <meta name="description" content="基于中文价格行为学 PDF 图表与 Al Brooks 字幕课总结整理的独立图表百科。" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">PA</span>
+        <div>
+          <strong>价格行为图表百科</strong>
+          <em>Cyber Finance Atlas</em>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <label for="searchInput">Command Search</label>
+        <input id="searchInput" type="search" placeholder="突破、H2、MTR、Always In、缺口..." autocomplete="off" />
+      </div>
+      <div class="author">Karthus.Liu</div>
+    </header>
+
+    <main class="app-shell">
+      <div class="left-rail">
+        <aside class="side-panel">
+          <section class="panel-card stats-card">
+            <span>Terminal</span>
+            <strong id="patternCount">--</strong>
+            <small>中文课件图 + 字幕讲解</small>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-title">
+              <span>排序</span>
+            </div>
+            <select id="sortSelect">
+              <option value="score">综合优先</option>
+              <option value="probability">胜率优先</option>
+              <option value="importance">重要性优先</option>
+              <option value="family">按家族</option>
+            </select>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-title">
+              <span>家族</span>
+            </div>
+            <div id="familyFilters" class="family-filters"></div>
+          </section>
+        </aside>
+
+        <section class="pattern-column">
+          <div class="column-head">
+            <div>
+              <span>百科目录</span>
+              <strong id="visibleCount">--</strong>
+            </div>
+            <button id="resetBtn" type="button">重置</button>
+          </div>
+          <div id="patternList" class="pattern-list"></div>
+        </section>
+      </div>
+
+      <section id="detail" class="detail"></section>
+    </main>
+
+    <div id="imageModal" class="image-modal" aria-hidden="true">
+      <button id="modalClose" type="button" aria-label="关闭">×</button>
+      <img id="modalImage" alt="" />
+      <p id="modalCaption"></p>
+    </div>
+
+    <footer class="footer">
+      <span>作者：Karthus.Liu</span>
+      <span>资料来源：本地 Al Brooks 中文 PDF 课件、原著译本与字幕课总结。仅用于学习复盘，不构成交易建议。</span>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

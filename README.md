@@ -10,6 +10,7 @@ Al Brooks 价格行为学一站式学习网站。
 - 全视频字幕摘要库
 - 全资料地图
 - 形态练习题与训练清单
+- 独立新版：136 个价格行为图表百科条目，544 张中文课件图，搭配 Brooks 字幕课综合讲解
 
 ## 本地运行
 
@@ -23,6 +24,20 @@ python -m http.server 8766 -d "E:\价格行为学"
 
 ```text
 http://127.0.0.1:8766/al-brooks-pattern-dashboard/
+```
+
+新版图表百科入口：
+
+```text
+http://127.0.0.1:8766/al-brooks-pattern-dashboard/price-action-cn-encyclopedia/
+```
+
+## 远程访问
+
+GitHub Pages 部署后，新版图表百科入口：
+
+```text
+https://liuchang2134.github.io/-/price-action-cn-encyclopedia/
 ```
 
 ## 说明

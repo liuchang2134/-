@@ -4,3 +4,7 @@ Thumbs.db
 *.log
 .vscode/
 tmp/
+.codex/
+__pycache__/
+*.pyc
+materials/barbybar_crawl/
