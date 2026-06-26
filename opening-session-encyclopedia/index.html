@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>早盘专题图表百科 | Karthus.Liu</title>
+    <meta name="description" content="基于 Al Brooks 开盘课程、中文课件图表和字幕总结整理的早盘专题图表百科。" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="返回顶部">
+        <span class="brand-mark">OP</span>
+        <span>
+          <strong>早盘专题图表百科</strong>
+          <em>Opening Session Atlas</em>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="页面导航">
+        <a href="../price-action-cn-encyclopedia/">图表总库</a>
+        <a href="#playbook">早盘路径</a>
+        <a href="#encyclopedia">图表百科</a>
+        <a href="#courses">课程索引</a>
+      </nav>
+      <div class="author">Karthus.Liu</div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Al Brooks Opening Playbook</p>
+          <h1>只学开盘：从第一根K到第一小时控制权</h1>
+          <p>
+            这个独立站只整理 Brooks 关于开盘、早盘第一小时、开盘区间、开盘反转、昨日高低点失败突破和开盘价磁力的内容。
+            它不是原百科的缩小版，而是一个按早盘交易流程重排的专题图表库。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#encyclopedia">进入图表百科</a>
+            <a class="secondary-action" href="#playbook">先看早盘路径</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="站点统计">
+          <div><span>专题形态</span><strong id="entryCount">--</strong></div>
+          <div><span>中文图表</span><strong id="chartCount">--</strong></div>
+          <div><span>核心课程</span><strong id="courseCount">--</strong></div>
+        </aside>
+      </section>
+
+      <section id="playbook" class="section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Opening Timeline</p>
+            <h2>早盘读图路径</h2>
+          </div>
+          <p>先定位置，再看跟随，最后决定当天按趋势、区间还是反转处理。</p>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+      <section id="encyclopedia" class="workspace">
+        <aside class="control-panel">
+          <div class="search-card">
+            <label for="searchInput">搜索</label>
+            <input id="searchInput" type="search" placeholder="开盘区间、跳空、昨日高低点..." autocomplete="off" />
+          </div>
+          <div class="filter-card">
+            <span>模块</span>
+            <div id="stageFilters" class="stage-filters"></div>
+          </div>
+          <div class="list-card">
+            <div class="list-head">
+              <span>百科目录</span>
+              <strong id="visibleCount">--</strong>
+            </div>
+            <div id="entryList" class="entry-list"></div>
+          </div>
+        </aside>
+
+        <section id="detail" class="detail" aria-live="polite"></section>
+      </section>
+
+      <section id="courses" class="section course-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Course Index</p>
+            <h2>开盘相关课程索引</h2>
+          </div>
+          <p>优先看 48A-48F，再用 46 和奖励课补开盘区间、密集交易区间。</p>
+        </div>
+        <div id="courseGrid" class="course-grid"></div>
+      </section>
+
+      <section class="section glossary-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Terms</p>
+            <h2>早盘术语速查</h2>
+          </div>
+        </div>
+        <div id="glossary" class="glossary-grid"></div>
+      </section>
+    </main>
+
+    <div id="imageModal" class="image-modal" aria-hidden="true">
+      <button id="modalClose" type="button" aria-label="关闭大图">×</button>
+      <img id="modalImage" alt="" />
+      <p id="modalCaption"></p>
+    </div>
+
+    <footer class="footer">
+      <span>作者：Karthus.Liu</span>
+      <span>资料来源：本地 Al Brooks 开盘课程、中文课件图表和字幕总结。仅用于学习复盘，不构成交易建议。</span>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
